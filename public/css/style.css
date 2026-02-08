@@ -1,0 +1,539 @@
+/* public/css/style.css - Landing page & auth styling (rapih) */
+
+/* Palette */
+:root {
+  --brown-900: #4b2214;
+  --brown-800: #5b2f1a;
+  --brown-700: #7a4b36;
+  --brown-600: #8b5a41;
+  --brown-200: #e7d6cf;
+  --white: #ffffff;
+  --muted: #6c6c6c;
+}
+
+/* Reset / Base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  background: #fff;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* NAVBAR */
+.navbar {
+  background: var(--white);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 12px 0;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar .brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--brown-900);
+}
+
+.navbar .nav-menu {
+  margin: 0 auto;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.navbar .nav-menu a {
+  color: #222;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.navbar .nav-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Buttons */
+.btn-outline-brown {
+  border: 1px solid var(--brown-700);
+  color: var(--brown-700);
+  background: transparent;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-brown {
+  background: var(--brown-700);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 700;
+  border: 0;
+}
+
+/* HERO */
+.hero-outer {
+  background: linear-gradient(90deg, var(--brown-200) 0%, var(--brown-700) 100%);
+  color: #fff;
+  padding: 70px 0 60px 0;
+  overflow: hidden;
+}
+
+.hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-row {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.hero-left {
+  flex: 1.05;
+  padding-right: 10px;
+}
+
+.hero-right {
+  flex: 0.85;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-title {
+  font-size: 48px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 0 0 18px 0;
+}
+
+.hero-desc {
+  font-size: 16px;
+  max-width: 520px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 22px;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  width: 100%;
+  min-height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.hero-cta {
+  margin-top: 8px;
+}
+
+/* SECTION: OUR SERVICE */
+.section {
+  padding: 60px 0;
+}
+
+.section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.services-row {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.service-card {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 320px;
+  padding: 26px;
+  box-shadow: 0 10px 30px rgba(11, 16, 20, 0.06);
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.service-card .icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.service-card h5 {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+/* ABOUT SECTION */
+.about-section {
+  padding: 60px 0;
+  background: #fafafa;
+}
+
+.about-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.about-left {
+  flex: 1;
+}
+
+.about-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.about-card {
+  background:#fff;
+  border-radius:12px;
+  width:100%;
+  height:350px;   /* ubah dari 260px ke 350px */
+  border:1px solid rgba(0,0,0,0.03);
+  overflow:hidden;   /* agar map ikut rounded */
+}
+
+/* FOOTER base (kept for landing) */
+.footer {
+  background: var(--brown-800);
+  color: #fff;
+  padding: 40px 0 0 0;
+  margin-top: 0;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .hero-row {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .hero-left,
+  .hero-right {
+    width: 100%;
+  }
+
+  .hero-title {
+    font-size: 34px;
+  }
+
+  .services-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .about-inner {
+    flex-direction: column;
+  }
+
+  .navbar .nav-menu {
+    display: none; /* hide center menu on small */
+  }
+}
+
+/* ========== LOGIN & REGISTER PAGE STYLING ========== */
+
+/* Wrapper untuk center di tengah layar */
+.center-screen {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Card / Box form */
+.card-auth {
+  width: 380px;
+  background: #fff;
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Centered logo */
+.logo-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* Form controls */
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  border-radius: 6px;
+  height: 44px;
+  border: 1px solid #d9d9d9;
+}
+
+.form-control:focus {
+  border-color: var(--brown-700);
+  box-shadow: 0 0 0 .15rem rgba(122, 75, 54, 0.15);
+}
+
+/* Tombol Login & Daftar */
+.btn-primary-custom {
+  background: var(--brown-700);
+  color: #fff;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.btn-primary-custom:hover {
+  background: var(--brown-800);
+}
+
+/* Eye button (show password) */
+.input-eye {
+  border-left: 1px solid #e3e3e3;
+  background: #fff;
+}
+
+/* Small text */
+.small-muted {
+  text-align: center;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ========== FOOTER - layout like image 1 ========== */
+
+/* top wrapper (columns) */
+.footer-top.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 0 20px;
+}
+
+/* columns wrapper */
+.footer-cols {
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+/* each column */
+.footer-col {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+/* headings */
+.footer-col h5,
+.footer-col h6 {
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+/* muted paragraph */
+.footer-col .muted {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* social badges */
+.social-badges {
+  margin-top: 12px;
+}
+
+.social-badges span {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.95);
+  padding: 6px 10px;
+  margin-right: 8px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+/* thin separator line under columns */
+.footer-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-top: 28px;
+  width: 100%;
+}
+
+/* copyright centered below separator */
+.footer-bottom {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  padding: 14px 0 24px 0;
+}
+
+/* responsive tweaks for footer */
+@media (max-width: 991px) {
+  .footer-cols {
+    gap: 18px;
+  }
+
+  .footer-col {
+    flex-basis: 100%;
+  }
+
+  .footer-top.container {
+    padding: 24px 18px 0 18px;
+  }
+}
+
+/* tambahan untuk about page */
+.about-left ul { padding-left: 18px; }
+.service-card { transition: transform .18s ease, box-shadow .18s ease; }
+.service-card:hover { transform: translateY(-6px); box-shadow: 0 18px 36px rgba(11,16,20,0.08); }
+
+/* MAP WRAPPER - responsive & rapi */
+.map-wrapper {
+  max-width: 720px;
+  margin: 18px auto 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(11,16,20,0.06);
+  background: #fff;
+}
+
+.map-embed {
+  display: block;
+  width: 100% !important;
+  height: 360px; /* ubah jika mau lebih besar/kecil */
+  border: 0;
+}
+
+/* mobile tweak */
+@media (max-width: 576px) {
+  .map-embed { height: 260px; }
+}
+
+/* PRODUCT CARD */
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(11,16,20,0.06);
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.04);
+  height: 100%;
+}
+
+.product-img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* ================= FOOTER FIX ================= */
+
+/* Footer full (home, profile, apotek, dll) */
+.footer {
+  background: var(--brown-800);
+  color: #ffffff;
+  margin-top: 80px;
+}
+
+/* Kolom footer */
+.footer-top {
+  padding: 40px 0 0;
+}
+
+.footer-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+}
+
+/* Text */
+.footer-col h5,
+.footer-col h6 {
+  color: #ffffff;
+}
+
+.footer-col .muted {
+  color: #f2e9e4; /* JANGAN rgba tipis */
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Social badge */
+.social-badges span {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* Separator */
+.footer-sep {
+  height: 1px;
+  background: rgba(255,255,255,0.25);
+  margin-top: 28px;
+}
+
+/* Bottom copyright */
+.footer-bottom {
+  background: var(--brown-900);
+  text-align: center;
+  padding: 14px 0 20px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Footer untuk halaman auth */
+.footer-auth {
+  background: var(--brown-800);
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 40px;
+}
