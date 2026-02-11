@@ -1,0 +1,70 @@
+/* Additional styles for password reset flow */
+
+.card-auth {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.center-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.logo-box {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.btn-primary-custom {
+    background-color: #8B4513;
+    border-color: #8B4513;
+    color: white;
+    padding: 0.625rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-primary-custom:hover {
+    background-color: #6B3410;
+    border-color: #6B3410;
+}
+
+.input-eye {
+    background-color: #8B4513;
+    border-color: #8B4513;
+    color: white;
+}
+
+.input-eye:hover {
+    background-color: #6B3410;
+    border-color: #6B3410;
+}
+
+.small-muted {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.small-muted a {
+    color: #8B4513;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.small-muted a:hover {
+    text-decoration: underline;
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}

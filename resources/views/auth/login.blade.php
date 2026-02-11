@@ -9,6 +9,13 @@
       <img src="{{ asset('logo.png') }}" alt="logo" style="height:68px;">
     </div>
 
+    @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+
     <form method="POST" action="/login">
       @csrf
 
@@ -29,6 +36,10 @@
             </svg>
           </button>
         </div>
+      </div>
+
+      <div class="text-end mb-3">
+        <a href="{{ route('password.request') }}" class="small text-decoration-none">Lupa Password?</a>
       </div>
 
       <div class="d-grid mb-2">
