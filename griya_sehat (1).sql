@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 11, 2026 at 08:18 PM
+-- Generation Time: Feb 11, 2026 at 09:18 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -239,7 +239,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (15, '2026_02_11_062237_create_doctor_schedules_table', 12),
 (16, '2026_02_11_063055_add_booking_fields_to_patient_histories_table', 13),
 (18, '2026_02_11_182321_update_patient_histories_confirmed_at_timezone', 14),
-(19, '2026_02_11_220013_create_pharmacy_products_table', 14);
+(19, '2026_02_11_220013_create_pharmacy_products_table', 14),
+(20, '2026_02_12_035353_add_reset_token_to_users_table', 15);
 
 -- --------------------------------------------------------
 
@@ -278,13 +279,6 @@ CREATE TABLE `patient_histories` (
   `keluhan` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `patient_histories`
---
-
-INSERT INTO `patient_histories` (`id`, `kode_antrian`, `user_id`, `patient_name`, `visit_date`, `service`, `status`, `arrival_status`, `confirmed_at`, `created_at`, `updated_at`, `poli`, `dokter`, `tanggal`, `appointment_time`, `keluhan`) VALUES
-(20, 'A001', 21, 'Natanael', NULL, NULL, 'Dipanggil', 'Sudah Hadir', '2026-02-11 19:59:40', '2026-02-11 19:59:00', '2026-02-11 19:59:40', 'Akupuntur Biasa', 'Impian Delillah Jazmine, S.Tr.Battra', '2026-02-12', '19:00:00', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -301,13 +295,6 @@ CREATE TABLE `pharmacy_products` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `pharmacy_products`
---
-
-INSERT INTO `pharmacy_products` (`id`, `name`, `image`, `price`, `tokopedia_link`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Obat Saraf Kejepit', 'pharmacy-products/gFinil0H4QXiEEeIUvzfs8pTCKbyf63BMpeV8pcY.png', 54000.00, 'https://tk.tokopedia.com/ZSmNFHmbB/', 1, '2026-02-11 15:47:46', '2026-02-11 15:49:19');
 
 -- --------------------------------------------------------
 
@@ -362,7 +349,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('6eA3ifVbj6QqdL0FxtJfs8OX1BU32vItUIlQMlXW', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoicEFFd0FreEwyT3lPM1k2ZGxHVkJoWnBTN3YyYVJJaGZGNGNqZzU2USI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9ob21lIjtzOjU6InJvdXRlIjtzOjQ6ImhvbWUiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1770840136);
+('FaqX5rQzY9htUlgvxvqDwV8CoCfcQ0EpShJMCKFR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYmg2cGEwNGl2YzZ1TUhFajJlM3dhdUl4c2tYcGdNcDAyZUhzQ2w1eiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7czo1OiJyb3V0ZSI7czo1OiJsb2dpbiI7fX0=', 1770841829),
+('uQVEjEWzJY40C0hv08PmZ1F0Pbqm5cvjwqtVnGtk', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTklJMTN0dG1INU1PRlNLYlF3bllLZkFXT1ExZnFQS3dPb2JnNGxZbCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9ob21lIjtzOjU6InJvdXRlIjtzOjQ6ImhvbWUiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1770844369);
 
 -- --------------------------------------------------------
 
@@ -379,6 +367,8 @@ CREATE TABLE `users` (
   `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reset_token` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reset_token_expires_at` timestamp NULL DEFAULT NULL,
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -388,15 +378,13 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `phone`, `address`, `email`, `role`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Isaac Yeremia Nugroho', '081217724337', 'Jl. Raya Sukomanunggal No.87', 'isaacyeremia@gmail.com', 'user', NULL, '$2y$12$3rtBurKtWnqO/RESXvyTwOoFGT.e3rpON/zFnOFjHaUOB2PSBpzjq', NULL, '2025-11-28 01:19:09', '2026-02-08 23:10:13'),
-(14, 'catty santoso', '0845678910', 'JL. Dr. Ir. H. Soekarno No.201b', 'cattysantoso@gmail.com', 'terapis', NULL, '$2y$12$QfavMgfp5ByjLczJej8Xdu8sOduS7Xb9pcEC9tGN/ffzYP6IgBmlO', NULL, '2026-02-06 22:14:09', '2026-02-06 22:14:09'),
-(16, 'admin_griya_sehat', '082227272234', 'JL. Dr. Ir. H. Soekarno No.201b', 'griyasehat@ukdc.ukdc.ac.id', 'admin', NULL, '$2y$12$uzDa9pswWvr.EjDtvfNRheMSdEmtrn5MfCQI2UTh9JDQ0etmrwipG', NULL, '2026-02-08 22:58:31', '2026-02-08 22:58:31'),
-(17, 'Alfredo Aldo E. P. Tjundawan, B.Med., M.MED', '0812345678910', 'Jl. Dr. Ir. H. Soekarno No.201b', 'AlfredoAldo@gmail.com', 'terapis', NULL, '$2y$12$F5/YlDG37VFU0DKs0m9NRetLYFSbNzScI9i9ObljybRDLVgJ9tcxW', NULL, '2026-02-10 21:13:30', '2026-02-10 21:13:30'),
-(18, 'Retnawati, B,Med., B.Ed', '08512345678', 'Jl. Dr. Ir. H. Soekarno No.201b', 'retnawati@gmail.com', 'terapis', NULL, '$2y$12$mu9FtPfnwWVTNfH6pp09h.Psi2vVv2q.Au3dqGjp/Jz92c5WWzWeW', NULL, '2026-02-11 01:25:18', '2026-02-11 01:25:18'),
-(19, 'Fadlila Ilmi Zarkasi, S.Tr.Battra.', '08123568974', 'Jl. Dr. Ir. H. Soekarno No.201b', 'fadlila@gmail.com', 'terapis', NULL, '$2y$12$.bXFAh0rlm8v9UuDARpqAObEJB16xsVkg/MvXUUx6naUq/u23BRkC', NULL, '2026-02-11 01:42:23', '2026-02-11 01:42:23'),
-(20, 'Impian Delillah Jazmine, S.Tr.Battra', '08987654321', 'Jl. Dr. Ir. H. Soekarno No.201b', 'ImpianDelillah@gmail.com', 'terapis', NULL, '$2y$12$sMKzGtdvgrEUeB9d/5502uuhw1iMTmLpgoGaB554AyVP9KN9uXElC', NULL, '2026-02-11 01:44:47', '2026-02-11 01:44:47'),
-(21, 'Natanael', '08123565478', 'asjasjdnaj', 'natanael@gmail.com', 'user', NULL, '$2y$12$jCcQG3UZH6.fktKrFntxeOTRCwTm.K5z6lDbayPEcHZnwDuGLrq..', NULL, '2026-02-11 19:58:09', '2026-02-11 19:58:09');
+INSERT INTO `users` (`id`, `name`, `phone`, `address`, `email`, `role`, `email_verified_at`, `password`, `reset_token`, `reset_token_expires_at`, `remember_token`, `created_at`, `updated_at`) VALUES
+(14, 'catty santoso', '0845678910', 'JL. Dr. Ir. H. Soekarno No.201b', 'cattysantoso@gmail.com', 'terapis', NULL, '$2y$12$QfavMgfp5ByjLczJej8Xdu8sOduS7Xb9pcEC9tGN/ffzYP6IgBmlO', NULL, NULL, NULL, '2026-02-06 22:14:09', '2026-02-06 22:14:09'),
+(16, 'admin_griya_sehat', '082227272234', 'JL. Dr. Ir. H. Soekarno No.201b', 'griyasehat@ukdc.ukdc.ac.id', 'admin', NULL, '$2y$12$uzDa9pswWvr.EjDtvfNRheMSdEmtrn5MfCQI2UTh9JDQ0etmrwipG', NULL, NULL, NULL, '2026-02-08 22:58:31', '2026-02-08 22:58:31'),
+(17, 'Alfredo Aldo E. P. Tjundawan, B.Med., M.MED', '0812345678910', 'Jl. Dr. Ir. H. Soekarno No.201b', 'AlfredoAldo@gmail.com', 'terapis', NULL, '$2y$12$F5/YlDG37VFU0DKs0m9NRetLYFSbNzScI9i9ObljybRDLVgJ9tcxW', NULL, NULL, NULL, '2026-02-10 21:13:30', '2026-02-10 21:13:30'),
+(18, 'Retnawati, B,Med., B.Ed', '08512345678', 'Jl. Dr. Ir. H. Soekarno No.201b', 'retnawati@gmail.com', 'terapis', NULL, '$2y$12$mu9FtPfnwWVTNfH6pp09h.Psi2vVv2q.Au3dqGjp/Jz92c5WWzWeW', NULL, NULL, NULL, '2026-02-11 01:25:18', '2026-02-11 01:25:18'),
+(19, 'Fadlila Ilmi Zarkasi, S.Tr.Battra.', '08123568974', 'Jl. Dr. Ir. H. Soekarno No.201b', 'fadlila@gmail.com', 'terapis', NULL, '$2y$12$.bXFAh0rlm8v9UuDARpqAObEJB16xsVkg/MvXUUx6naUq/u23BRkC', NULL, NULL, NULL, '2026-02-11 01:42:23', '2026-02-11 01:42:23'),
+(20, 'Impian Delillah Jazmine, S.Tr.Battra', '08987654321', 'Jl. Dr. Ir. H. Soekarno No.201b', 'ImpianDelillah@gmail.com', 'terapis', NULL, '$2y$12$sMKzGtdvgrEUeB9d/5502uuhw1iMTmLpgoGaB554AyVP9KN9uXElC', NULL, NULL, NULL, '2026-02-11 01:44:47', '2026-02-11 01:44:47');
 
 --
 -- Indexes for dumped tables
@@ -553,7 +541,7 @@ ALTER TABLE `medical_records`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `patient_histories`
