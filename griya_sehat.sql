@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 08, 2026 at 06:33 PM
+-- Generation Time: Feb 11, 2026 at 08:18 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -95,6 +95,40 @@ INSERT INTO `doctors` (`id`, `name`, `specialization`, `schedule`, `image`, `is_
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `doctor_schedules`
+--
+
+CREATE TABLE `doctor_schedules` (
+  `id` bigint UNSIGNED NOT NULL,
+  `doctor_id` bigint UNSIGNED NOT NULL,
+  `day_of_week` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `quota` int NOT NULL DEFAULT '20',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `doctor_schedules`
+--
+
+INSERT INTO `doctor_schedules` (`id`, `doctor_id`, `day_of_week`, `start_time`, `end_time`, `quota`, `is_active`, `created_at`, `updated_at`) VALUES
+(26, 1, 'Jumat', '13:00:00', '17:00:00', 999, 1, '2026-02-11 02:07:27', '2026-02-11 02:07:27'),
+(27, 2, 'Selasa', '13:00:00', '18:00:00', 999, 1, '2026-02-11 02:07:58', '2026-02-11 02:07:58'),
+(28, 2, 'Kamis', '13:00:00', '18:00:00', 999, 1, '2026-02-11 02:08:20', '2026-02-11 02:08:20'),
+(29, 3, 'Senin', '08:00:00', '13:00:00', 999, 1, '2026-02-11 02:08:43', '2026-02-11 02:08:43'),
+(30, 3, 'Rabu', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:09:03', '2026-02-11 02:09:03'),
+(31, 3, 'Jumat', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:09:20', '2026-02-11 02:09:20'),
+(32, 4, 'Selasa', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:10:04', '2026-02-11 02:10:04'),
+(33, 4, 'Kamis', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:10:27', '2026-02-11 02:10:27'),
+(34, 5, 'Selasa', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:10:50', '2026-02-11 02:10:50'),
+(35, 5, 'Jumat', '18:00:00', '21:00:00', 999, 1, '2026-02-11 02:11:13', '2026-02-11 02:11:13');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `failed_jobs`
 --
 
@@ -171,13 +205,6 @@ CREATE TABLE `medical_records` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `medical_records`
---
-
-INSERT INTO `medical_records` (`id`, `patient_id`, `terapis_id`, `queue_id`, `complaint`, `anamnesis`, `riwayat_penyakit`, `diagnosis`, `diagnosis_awal`, `diagnosis_akhir`, `treatment`, `pengobatan`, `medicine`, `obat_diberikan`, `doctor_note`, `catatan_tambahan`, `checkup_date`, `created_at`, `updated_at`) VALUES
-(1, 1, 14, 12, 'sakit pinggang', NULL, NULL, 'sakit bagian pinggang', NULL, NULL, 'Akupuntur', NULL, 'obat nyeri pinggang dengan dosis yang sedikit', NULL, 'minum obatnya secara rutin setelah makan sebanyak 3x sehari dan banyak bergerak', NULL, '2026-02-09', '2026-02-08 01:48:22', '2026-02-08 01:48:22');
-
 -- --------------------------------------------------------
 
 --
@@ -208,7 +235,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (11, '2026_02_07_181459_create_medical_records_table', 8),
 (12, '2026_02_08_054231_add_fields_to_medical_records_table', 9),
 (13, '2026_02_08_075000_fix_medical_records_table', 10),
-(14, '2026_02_08_100000_recreate_medical_records_table', 11);
+(14, '2026_02_08_100000_recreate_medical_records_table', 11),
+(15, '2026_02_11_062237_create_doctor_schedules_table', 12),
+(16, '2026_02_11_063055_add_booking_fields_to_patient_histories_table', 13),
+(18, '2026_02_11_182321_update_patient_histories_confirmed_at_timezone', 14),
+(19, '2026_02_11_220013_create_pharmacy_products_table', 14);
 
 -- --------------------------------------------------------
 
@@ -236,11 +267,14 @@ CREATE TABLE `patient_histories` (
   `visit_date` date DEFAULT NULL,
   `service` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `arrival_status` enum('Belum Hadir','Sudah Hadir','Tidak Hadir') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Belum Hadir',
+  `confirmed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `poli` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `dokter` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tanggal` date DEFAULT NULL,
+  `appointment_time` time DEFAULT NULL,
   `keluhan` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -248,8 +282,32 @@ CREATE TABLE `patient_histories` (
 -- Dumping data for table `patient_histories`
 --
 
-INSERT INTO `patient_histories` (`id`, `kode_antrian`, `user_id`, `patient_name`, `visit_date`, `service`, `status`, `created_at`, `updated_at`, `poli`, `dokter`, `tanggal`, `keluhan`) VALUES
-(12, 'A001', 1, 'Isaac', '2026-02-09', 'Akupuntur Biasa', 'Selesai', '2026-02-08 00:36:43', '2026-02-08 01:57:37', 'Akupuntur Biasa', 'Catty Santoso, B.Med', '2026-02-09', NULL);
+INSERT INTO `patient_histories` (`id`, `kode_antrian`, `user_id`, `patient_name`, `visit_date`, `service`, `status`, `arrival_status`, `confirmed_at`, `created_at`, `updated_at`, `poli`, `dokter`, `tanggal`, `appointment_time`, `keluhan`) VALUES
+(20, 'A001', 21, 'Natanael', NULL, NULL, 'Dipanggil', 'Sudah Hadir', '2026-02-11 19:59:40', '2026-02-11 19:59:00', '2026-02-11 19:59:40', 'Akupuntur Biasa', 'Impian Delillah Jazmine, S.Tr.Battra', '2026-02-12', '19:00:00', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pharmacy_products`
+--
+
+CREATE TABLE `pharmacy_products` (
+  `id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price` decimal(12,2) NOT NULL,
+  `tokopedia_link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `pharmacy_products`
+--
+
+INSERT INTO `pharmacy_products` (`id`, `name`, `image`, `price`, `tokopedia_link`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Obat Saraf Kejepit', 'pharmacy-products/gFinil0H4QXiEEeIUvzfs8pTCKbyf63BMpeV8pcY.png', 54000.00, 'https://tk.tokopedia.com/ZSmNFHmbB/', 1, '2026-02-11 15:47:46', '2026-02-11 15:49:19');
 
 -- --------------------------------------------------------
 
@@ -304,8 +362,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('4Gy5P0o6iQY9XxYJINil53b9sNWkQQm5jVbJUePU', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoibmsxN1pKTEc0UnN3ckRubjY4OEhQM3dWeUFFY0R1THhBQldZZjRFRyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9maWxlL21lZGljYWwtcmVjb3JkLzEiO3M6NToicm91dGUiO3M6Mjc6InByb2ZpbGUubWVkaWNhbC1yZWNvcmQuc2hvdyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1770570294),
-('zm939eoT0WpNmUveblFpjs2yE4RYxlFAYAoYrAAU', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidlZWTGZ0OWcxeGdZbjFnQmVzWURnTzlDbTBMcUN1S0czd0w2eWRxeSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9maWxlIjtzOjU6InJvdXRlIjtzOjc6InByb2ZpbGUiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1770541185);
+('6eA3ifVbj6QqdL0FxtJfs8OX1BU32vItUIlQMlXW', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoicEFFd0FreEwyT3lPM1k2ZGxHVkJoWnBTN3YyYVJJaGZGNGNqZzU2USI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9ob21lIjtzOjU6InJvdXRlIjtzOjQ6ImhvbWUiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1770840136);
 
 -- --------------------------------------------------------
 
@@ -332,11 +389,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `phone`, `address`, `email`, `role`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Isaac', '081217724337', 'Jl. Raya Sukomanunggal no 85a', 'isaac.nugroho@student.ukdc.ac.id', 'user', NULL, '$2y$12$3rtBurKtWnqO/RESXvyTwOoFGT.e3rpON/zFnOFjHaUOB2PSBpzjq', NULL, '2025-11-28 01:19:09', '2025-12-15 00:04:00'),
-(9, 'Admin', '08123456789', 'Jakarta', 'admin@griyasehat.com', 'admin', NULL, '$2y$12$RIQZS5ejPs6/o6yvaTs74uk32t5CeNXX1JKtSp7FBIIyLmQ8pyDcC', NULL, '2026-02-04 23:48:03', '2026-02-04 23:48:03'),
-(12, 'Admin2', '0823456789', 'Jl. Dr. Ir. H. Soekarno No.201', 'admin2@gmail.com', 'admin', NULL, '$2y$12$gSJ5gOTnBacY2lCCbVij0eYeyCeqfi/9joE7HMLTGADbfi6/RQEze', NULL, '2026-02-06 07:49:49', '2026-02-06 07:49:49'),
-(13, 'admin3', '08345678910', 'Jl. Dr. Ir. H. Soekarno No.201b', 'admin3@gmail.com', 'admin', NULL, '$2y$12$aTzRvTXGfhGnjgJrTQvu1.P0.Wj1MxtZXrcAf4.tV05lD74GByUiq', NULL, '2026-02-06 21:34:34', '2026-02-06 21:34:34'),
-(14, 'catty santoso', '0845678910', 'JL. Dr. Ir. H. Soekarno No.201b', 'cattysantoso@gmail.com', 'terapis', NULL, '$2y$12$QfavMgfp5ByjLczJej8Xdu8sOduS7Xb9pcEC9tGN/ffzYP6IgBmlO', NULL, '2026-02-06 22:14:09', '2026-02-06 22:14:09');
+(1, 'Isaac Yeremia Nugroho', '081217724337', 'Jl. Raya Sukomanunggal No.87', 'isaacyeremia@gmail.com', 'user', NULL, '$2y$12$3rtBurKtWnqO/RESXvyTwOoFGT.e3rpON/zFnOFjHaUOB2PSBpzjq', NULL, '2025-11-28 01:19:09', '2026-02-08 23:10:13'),
+(14, 'catty santoso', '0845678910', 'JL. Dr. Ir. H. Soekarno No.201b', 'cattysantoso@gmail.com', 'terapis', NULL, '$2y$12$QfavMgfp5ByjLczJej8Xdu8sOduS7Xb9pcEC9tGN/ffzYP6IgBmlO', NULL, '2026-02-06 22:14:09', '2026-02-06 22:14:09'),
+(16, 'admin_griya_sehat', '082227272234', 'JL. Dr. Ir. H. Soekarno No.201b', 'griyasehat@ukdc.ukdc.ac.id', 'admin', NULL, '$2y$12$uzDa9pswWvr.EjDtvfNRheMSdEmtrn5MfCQI2UTh9JDQ0etmrwipG', NULL, '2026-02-08 22:58:31', '2026-02-08 22:58:31'),
+(17, 'Alfredo Aldo E. P. Tjundawan, B.Med., M.MED', '0812345678910', 'Jl. Dr. Ir. H. Soekarno No.201b', 'AlfredoAldo@gmail.com', 'terapis', NULL, '$2y$12$F5/YlDG37VFU0DKs0m9NRetLYFSbNzScI9i9ObljybRDLVgJ9tcxW', NULL, '2026-02-10 21:13:30', '2026-02-10 21:13:30'),
+(18, 'Retnawati, B,Med., B.Ed', '08512345678', 'Jl. Dr. Ir. H. Soekarno No.201b', 'retnawati@gmail.com', 'terapis', NULL, '$2y$12$mu9FtPfnwWVTNfH6pp09h.Psi2vVv2q.Au3dqGjp/Jz92c5WWzWeW', NULL, '2026-02-11 01:25:18', '2026-02-11 01:25:18'),
+(19, 'Fadlila Ilmi Zarkasi, S.Tr.Battra.', '08123568974', 'Jl. Dr. Ir. H. Soekarno No.201b', 'fadlila@gmail.com', 'terapis', NULL, '$2y$12$.bXFAh0rlm8v9UuDARpqAObEJB16xsVkg/MvXUUx6naUq/u23BRkC', NULL, '2026-02-11 01:42:23', '2026-02-11 01:42:23'),
+(20, 'Impian Delillah Jazmine, S.Tr.Battra', '08987654321', 'Jl. Dr. Ir. H. Soekarno No.201b', 'ImpianDelillah@gmail.com', 'terapis', NULL, '$2y$12$sMKzGtdvgrEUeB9d/5502uuhw1iMTmLpgoGaB554AyVP9KN9uXElC', NULL, '2026-02-11 01:44:47', '2026-02-11 01:44:47'),
+(21, 'Natanael', '08123565478', 'asjasjdnaj', 'natanael@gmail.com', 'user', NULL, '$2y$12$jCcQG3UZH6.fktKrFntxeOTRCwTm.K5z6lDbayPEcHZnwDuGLrq..', NULL, '2026-02-11 19:58:09', '2026-02-11 19:58:09');
 
 --
 -- Indexes for dumped tables
@@ -366,6 +426,13 @@ ALTER TABLE `cache_locks`
 --
 ALTER TABLE `doctors`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `doctor_schedules`
+--
+ALTER TABLE `doctor_schedules`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `doctor_schedules_doctor_id_foreign` (`doctor_id`);
 
 --
 -- Indexes for table `failed_jobs`
@@ -416,6 +483,12 @@ ALTER TABLE `patient_histories`
   ADD KEY `patient_histories_user_id_foreign` (`user_id`);
 
 --
+-- Indexes for table `pharmacy_products`
+--
+ALTER TABLE `pharmacy_products`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -453,6 +526,12 @@ ALTER TABLE `doctors`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `doctor_schedules`
+--
+ALTER TABLE `doctor_schedules`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
 -- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
@@ -468,19 +547,25 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `medical_records`
 --
 ALTER TABLE `medical_records`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `patient_histories`
 --
 ALTER TABLE `patient_histories`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `pharmacy_products`
+--
+ALTER TABLE `pharmacy_products`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -492,7 +577,7 @@ ALTER TABLE `services`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
@@ -503,6 +588,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `antrians`
   ADD CONSTRAINT `antrians_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `doctor_schedules`
+--
+ALTER TABLE `doctor_schedules`
+  ADD CONSTRAINT `doctor_schedules_doctor_id_foreign` FOREIGN KEY (`doctor_id`) REFERENCES `doctors` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `medical_records`
