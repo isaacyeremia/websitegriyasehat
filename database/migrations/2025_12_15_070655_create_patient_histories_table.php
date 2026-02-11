@@ -14,17 +14,29 @@ return new class extends Migration
         Schema::create('patient_histories', function (Blueprint $table) {
             $table->id();
 
-            // relasi ke user (akun login)
+            // Relasi ke user (akun login)
             $table->foreignId('user_id')
                   ->constrained()
                   ->onDelete('cascade');
 
-            // data riwayat pasien
+            // Data antrian pasien
             $table->string('patient_name');
-            $table->date('visit_date');
-            $table->string('service'); // Akupuntur, Herbal, dll
-            $table->string('status');  // Selesai, Proses, Batal
-
+            $table->string('kode_antrian')->unique();
+            $table->string('poli');
+            $table->string('dokter');
+            $table->date('tanggal');
+            $table->time('appointment_time')->nullable();
+            $table->text('keluhan')->nullable();
+            
+            // Status
+            $table->enum('status', ['Menunggu', 'Dipanggil', 'Selesai', 'Dibatalkan'])
+                  ->default('Menunggu');
+            $table->enum('arrival_status', ['Belum Hadir', 'Sudah Hadir', 'Tidak Hadir'])
+                  ->default('Belum Hadir');
+            
+            // Timestamp konfirmasi kedatangan
+            $table->timestamp('confirmed_at')->nullable();
+            
             $table->timestamps();
         });
     }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -15,28 +15,31 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'phone'    => 'required',
-        'password' => 'required',
-    ]);
+    {
+        $credentials = $request->validate([
+            'phone'    => 'required',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt(['phone' => $credentials['phone'], 'password' => $credentials['password']])) {
-        $request->session()->regenerate();
-        
-        // Redirect admin ke dashboard admin
-        if (Auth::user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::attempt(['phone' => $credentials['phone'], 'password' => $credentials['password']])) {
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
+            
+            // Auto-redirect berdasarkan role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'terapis') {
+                return redirect()->route('terapis.dashboard');
+            } else {
+                return redirect('/home');
+            }
         }
-        
-        // Redirect user biasa ke home
-        return redirect()->intended('/home');
-    }
 
-    return back()->withErrors([
-        'phone' => 'Nomor telepon atau password salah.',
-    ])->onlyInput('phone');
-}
+        return back()->withErrors([
+            'phone' => 'Nomor telepon atau password salah.',
+        ])->onlyInput('phone');
+    }
 
     public function showRegister()
     {
@@ -46,11 +49,11 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name'                  => 'required|string|max:255',
-            'phone'                 => 'required|string|unique:users,phone',
-            'address'               => 'nullable|string',
-            'email'                 => 'required|email|unique:users,email',
-            'password'              => 'required|string|min:6|confirmed',
+            'name'     => 'required|string|max:100',
+            'phone'    => 'required|string|unique:users,phone',
+            'address'  => 'nullable|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -59,7 +62,7 @@ class AuthController extends Controller
             'address'  => $data['address'] ?? null,
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'role'     => 'user', // Default role adalah user
+            'role'     => 'user', // Hanya user yang bisa register sendiri
         ]);
 
         Auth::login($user);
@@ -70,10 +73,9 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
+        
         return redirect('/login');
     }
 }

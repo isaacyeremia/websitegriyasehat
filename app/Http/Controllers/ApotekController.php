@@ -3,13 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\PharmacyProduct;
 
 class ApotekController extends Controller
 {
     public function index()
     {
-        $products = [
+        // Produk dari database
+        $dbProducts = PharmacyProduct::where('is_active', true)
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->map(function($product) {
+                            return [
+                                'name' => $product->name,
+                                'price' => $product->price,
+                                'image' => $product->image, // PENTING: TANPA prefix 'storage/'
+                                'link' => $product->tokopedia_link,
+                                'category' => 'database', // Penanda produk dari database
+                            ];
+                        })
+                        ->toArray();
 
+        // Produk hardcoded (yang sudah ada)
+        $hardcodedProducts = [
             // ================= MINYAK GOSOK =================
             [
                 'name' => 'Minyak Gosok Pijat Cap Tangga',
@@ -195,6 +211,9 @@ class ApotekController extends Controller
                 'category' => 'suplemen'
             ],
         ];
+
+        // Gabungkan produk database di awal, lalu produk hardcoded
+        $products = array_merge($dbProducts, $hardcodedProducts);
 
         return view('apotek.index', compact('products'));
     }

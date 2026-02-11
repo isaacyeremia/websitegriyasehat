@@ -22,6 +22,11 @@ Route::get('/', function () {
     return view('home');
 })->name('welcome');
 
+// Redirect root ke login
+Route::get('/', function () {
+    return redirect('/login');
+});
+
 // ============================================================
 // AUTH ROUTES - USER (Guest only)
 // ============================================================
@@ -62,19 +67,9 @@ Route::middleware('auth')->group(function () {
     // Antrian routes (require auth)
     Route::post('/antrian/store', [AntrianController::class, 'store'])->name('booking.store');
     Route::post('/antrian/cek', [AntrianController::class, 'cek'])->name('booking.cek');
-    
-    // Konfirmasi Kedatangan
-    Route::post('/antrian/{id}/confirm-arrival', [AntrianController::class, 'confirmArrival'])->name('booking.confirm-arrival');
-    Route::post('/antrian/{id}/cancel-arrival', [AntrianController::class, 'cancelArrival'])->name('booking.cancel-arrival');
-    
-    // API routes for AJAX
-    Route::get('/api/doctor/{id}/schedule', [AntrianController::class, 'getDoctorSchedule'])->name('api.doctor.schedule');
-    Route::get('/api/doctor/{id}/available-dates', [AntrianController::class, 'getAvailableDates'])->name('api.doctor.dates');
 });
 
-// ============================================================
-// ADMIN ROUTES (Auth + Admin only)
-// ============================================================
+// Admin routes (Auth + Admin only)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     
@@ -123,6 +118,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/pharmacy/{id}/toggle', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'toggleStatus'])->name('pharmacy.toggle');
 });
 
+
 // ============================================================
 // TERAPIS ROUTES (Auth + Terapis/Admin)
 // ============================================================
@@ -141,4 +137,52 @@ Route::middleware(['auth', 'terapis'])->prefix('terapis')->name('terapis.')->gro
     Route::get('/medical-records/create/{patientId}', [PatientManagementController::class, 'createMedicalRecord'])->name('medical-records.create');
     Route::post('/medical-records/store/{patientId}', [PatientManagementController::class, 'storeMedicalRecord'])->name('medical-records.store');
     Route::get('/medical-records/{recordId}', [PatientManagementController::class, 'showMedicalRecord'])->name('medical-records.show');
+});
+
+// Authenticated User routes
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    Route::get('/home', function () {
+        return view('home');
+    })->name('home');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/medical-record/{id}', [ProfileController::class, 'showMedicalRecord'])->name('profile.medical-record.show');
+    
+    // Antrian routes (require auth)
+    Route::post('/antrian/store', [AntrianController::class, 'store'])->name('booking.store');
+    Route::post('/antrian/cek', [AntrianController::class, 'cek'])->name('booking.cek');
+    
+    // API routes for AJAX
+    Route::get('/api/doctor/{id}/schedule', [AntrianController::class, 'getDoctorSchedule'])->name('api.doctor.schedule');
+    Route::get('/api/doctor/{id}/available-dates', [AntrianController::class, 'getAvailableDates'])->name('api.doctor.dates');
+});
+
+// Authenticated User routes
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    Route::get('/home', function () {
+        return view('home');
+    })->name('home');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/medical-record/{id}', [ProfileController::class, 'showMedicalRecord'])->name('profile.medical-record.show');
+    
+    // Antrian routes (require auth)
+    Route::post('/antrian/store', [AntrianController::class, 'store'])->name('booking.store');
+    Route::post('/antrian/cek', [AntrianController::class, 'cek'])->name('booking.cek');
+    
+    // Konfirmasi Kedatangan
+    Route::post('/antrian/{id}/confirm-arrival', [AntrianController::class, 'confirmArrival'])->name('booking.confirm-arrival');
+    Route::post('/antrian/{id}/cancel-arrival', [AntrianController::class, 'cancelArrival'])->name('booking.cancel-arrival');
+    
+    // API routes for AJAX
+    Route::get('/api/doctor/{id}/schedule', [AntrianController::class, 'getDoctorSchedule'])->name('api.doctor.schedule');
+    Route::get('/api/doctor/{id}/available-dates', [AntrianController::class, 'getAvailableDates'])->name('api.doctor.dates');
 });

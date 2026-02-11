@@ -5,14 +5,15 @@
 @section('content')
 <div class="container-fluid py-4">
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0">📋 Detail Pasien</h2>
             <p class="text-muted">Riwayat kunjungan dan rekam medis</p>
         </div>
-        <a href="{{ route('terapis.patients.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Kembali
-        </a>
+                <a href="{{ route('terapis.patients.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -24,7 +25,7 @@
 
     {{-- Info Pasien --}}
     <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-success text-white">
             <h5 class="mb-0"><i class="bi bi-person-circle"></i> Informasi Pasien</h5>
         </div>
         <div class="card-body">
@@ -32,8 +33,8 @@
                 <div class="col-md-6">
                     <table class="table table-borderless">
                         <tr>
-                            <th width="150">Nama</th>
-                            <td>: {{ $pasien->name }}</td>
+                            <th width="150">Nama Lengkap</th>
+                            <td>: <strong>{{ $pasien->name }}</strong></td>
                         </tr>
                         <tr>
                             <th>Email</th>

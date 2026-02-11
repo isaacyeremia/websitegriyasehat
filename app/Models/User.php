@@ -51,9 +51,17 @@ class User extends Authenticatable
     /**
      * Relasi ke Medical Records sebagai Terapis
      */
-    public function terapisMedicalRecords()
+    public function medicalRecordsAsTerapis()
     {
         return $this->hasMany(MedicalRecord::class, 'terapis_id');
+    }
+
+    /**
+     * Alias untuk terapisMedicalRecords (backward compatibility)
+     */
+    public function terapisMedicalRecords()
+    {
+        return $this->medicalRecordsAsTerapis();
     }
 
     /**

@@ -18,8 +18,8 @@
       <div class="footer-col">
         <h6>Jadwal Praktik</h6>
         <p class="muted">
-          Senin 08.00 – 17.00<br>
-          Selasa – Jumat 08.00 – 21.00<br>
+          Senin 08.00 – 13.00<br>
+          Selasa – Jumat 13.00 – 21.00<br>
           Sabtu – Minggu Tutup
         </p>
       </div>

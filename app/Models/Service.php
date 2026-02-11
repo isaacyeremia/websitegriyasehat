@@ -8,6 +8,24 @@ class Service extends Model
 {
     protected $fillable = [
         'name',
-        'is_active'
+        'description',
+        'icon',
+        'is_active',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    // Relasi ke patient histories
+    public function patientHistories()
+    {
+        return $this->hasMany(PatientHistory::class, 'poli', 'name');
+    }
+
+    // Get active services
+    public static function getActiveServices()
+    {
+        return self::where('is_active', true)->get();
+    }
 }
