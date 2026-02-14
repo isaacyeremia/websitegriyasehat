@@ -10,7 +10,25 @@
         Ambil nomor antrian dan pantau secara real-time tanpa perlu menunggu lama
     </p>
 
-    {{-- ALERT STATUS ANTRIAN SAAT INI --}}
+    {{-- ALERT STATUS ANTRIAN USER HARI INI --}}
+    @if(isset($userTodayQueue))
+        <div class="alert alert-warning alert-dismissible fade show mb-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle fs-3 me-3"></i>
+                <div>
+                    <strong>Antrian Anda Hari Ini:</strong> 
+                    <span class="fs-5 fw-bold text-dark">{{ $userTodayQueue->kode_antrian }}</span>
+                    <br>
+                    <small>Status: <strong>{{ $userTodayQueue->status }}</strong> | 
+                    Dokter: <strong>{{ $userTodayQueue->dokter }}</strong> | 
+                    Jam: <strong>{{ \Carbon\Carbon::parse($userTodayQueue->appointment_time)->format('H:i') }}</strong></small>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    {{-- ALERT STATUS ANTRIAN SAAT INI DIPANGGIL --}}
     @if($currentQueueNumber)
         <div class="alert alert-info alert-dismissible fade show mb-4">
             <div class="d-flex align-items-center">
@@ -72,33 +90,7 @@
                             </select>
                         </div>
 
-                        {{-- Pilih Dokter --}}
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="bi bi-person-badge"></i> Pilih Dokter/Terapis 
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select name="dokter" class="form-select form-select-lg" required id="selectDokter">
-                                <option value="">-- Pilih Dokter/Terapis --</option>
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->name }}" 
-                                            data-doctor-id="{{ $doctor->id }}"
-                                            {{ old('dokter') == $doctor->name ? 'selected' : '' }}>
-                                        {{ $doctor->name }} - {{ $doctor->specialization }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            
-                            {{-- Info Jadwal Dokter --}}
-                            <div id="doctorScheduleInfo" class="mt-2" style="display: none;">
-                                <div class="alert alert-info mb-0">
-                                    <strong><i class="bi bi-calendar-week"></i> Jadwal Praktek:</strong>
-                                    <div id="scheduleList" class="mt-2"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Pilih Tanggal (DATE PICKER) --}}
+                        {{-- Pilih Tanggal (PRIORITAS PERTAMA) --}}
                         <div class="mb-4">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-calendar-event"></i> Tanggal Kunjungan 
@@ -110,13 +102,36 @@
                                    required 
                                    id="selectTanggal"
                                    min="{{ date('Y-m-d') }}"
-                                   value="{{ old('tanggal') }}"
-                                   disabled>
+                                   value="{{ old('tanggal') }}">
                             <small class="text-muted">
-                                <i class="bi bi-info-circle"></i> Pilih dokter terlebih dahulu untuk melihat tanggal yang tersedia
+                                <i class="bi bi-info-circle"></i> Pilih tanggal terlebih dahulu untuk melihat dokter yang tersedia
                             </small>
-                            <div id="dateError" class="text-danger mt-1" style="display: none;">
-                                <small>Tanggal ini tidak sesuai jadwal praktek dokter</small>
+                        </div>
+
+                        {{-- Pilih Dokter (MUNCUL SETELAH TANGGAL) --}}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person-badge"></i> Pilih Dokter/Terapis 
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="dokter" class="form-select form-select-lg" required id="selectDokter" disabled>
+                                <option value="">-- Pilih tanggal terlebih dahulu --</option>
+                            </select>
+                            
+                            {{-- Info Jadwal & Kuota Dokter --}}
+                            <div id="doctorInfo" class="mt-2" style="display: none;">
+                                <div class="alert alert-info mb-0">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong><i class="bi bi-clock"></i> Jam Praktek:</strong>
+                                            <div id="practiceHours"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong><i class="bi bi-people"></i> Kuota Tersedia:</strong>
+                                            <div id="quotaInfo"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -134,8 +149,11 @@
                                    value="{{ old('appointment_time') }}"
                                    disabled>
                             <small class="text-muted" id="timeRangeInfo">
-                                <i class="bi bi-info-circle"></i> Pilih tanggal terlebih dahulu
+                                <i class="bi bi-info-circle"></i> Pilih dokter terlebih dahulu
                             </small>
+                            <div id="bookedSlotsWarning" class="alert alert-warning mt-2" style="display: none;">
+                                <small><i class="bi bi-exclamation-triangle"></i> <span id="bookedSlotsText"></span></small>
+                            </div>
                         </div>
 
                         {{-- Keluhan --}}
@@ -193,9 +211,9 @@
                 <div class="card-body">
                     <ol class="mb-0 ps-3">
                         <li class="mb-2">Pilih layanan/poli yang dibutuhkan</li>
-                        <li class="mb-2">Pilih dokter/terapis</li>
-                        <li class="mb-2">Sistem akan menampilkan jadwal praktek</li>
-                        <li class="mb-2">Pilih tanggal sesuai jadwal praktek</li>
+                        <li class="mb-2"><strong>Pilih tanggal kunjungan</strong></li>
+                        <li class="mb-2">Sistem akan menampilkan dokter yang tersedia di tanggal tersebut</li>
+                        <li class="mb-2">Pilih dokter (lihat kuota tersedia)</li>
                         <li class="mb-2">Pilih jam kunjungan sesuai jam praktek</li>
                         <li class="mb-2">Jelaskan keluhan (opsional)</li>
                         <li>Klik tombol "Ambil Nomor Antrian"</li>
@@ -308,150 +326,177 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const selectDokter = document.getElementById('selectDokter');
     const selectTanggal = document.getElementById('selectTanggal');
+    const selectDokter = document.getElementById('selectDokter');
     const selectTime = document.getElementById('selectTime');
-    const doctorScheduleInfo = document.getElementById('doctorScheduleInfo');
-    const scheduleList = document.getElementById('scheduleList');
-    const dateError = document.getElementById('dateError');
+    const doctorInfo = document.getElementById('doctorInfo');
+    const practiceHours = document.getElementById('practiceHours');
+    const quotaInfo = document.getElementById('quotaInfo');
     const timeRangeInfo = document.getElementById('timeRangeInfo');
     const submitBtn = document.getElementById('submitBtn');
+    const bookedSlotsWarning = document.getElementById('bookedSlotsWarning');
+    const bookedSlotsText = document.getElementById('bookedSlotsText');
 
-    let currentSchedules = [];
-    let availableDates = [];
+    let currentDoctorData = null;
+    let bookedSlots = [];
+
+    // Event: Saat tanggal dipilih - LOAD AVAILABLE DOCTORS
+    selectTanggal.addEventListener('change', function() {
+        const selectedDate = this.value;
+        
+        // Reset
+        selectDokter.innerHTML = '<option value="">-- Memuat dokter tersedia... --</option>';
+        selectDokter.disabled = true;
+        selectTime.value = '';
+        selectTime.disabled = true;
+        submitBtn.disabled = true;
+        doctorInfo.style.display = 'none';
+        bookedSlotsWarning.style.display = 'none';
+
+        if (!selectedDate) {
+            selectDokter.innerHTML = '<option value="">-- Pilih tanggal terlebih dahulu --</option>';
+            return;
+        }
+
+        // Fetch available doctors untuk tanggal ini
+        fetch(`/api/available-doctors/${selectedDate}`)
+            .then(response => response.json())
+            .then(doctors => {
+                selectDokter.innerHTML = '<option value="">-- Pilih Dokter/Terapis --</option>';
+                
+                if (doctors.length === 0) {
+                    selectDokter.innerHTML = '<option value="">-- Tidak ada dokter tersedia di tanggal ini --</option>';
+                    selectDokter.disabled = true;
+                    return;
+                }
+
+                doctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.name;
+                    option.setAttribute('data-doctor-id', doctor.id);
+                    option.setAttribute('data-start-time', doctor.start_time);
+                    option.setAttribute('data-end-time', doctor.end_time);
+                    option.setAttribute('data-quota-left', doctor.quota_left);
+                    option.setAttribute('data-total-quota', doctor.total_quota);
+                    option.textContent = `${doctor.name} - ${doctor.specialization} (Kuota: ${doctor.quota_left}/${doctor.total_quota})`;
+                    selectDokter.appendChild(option);
+                });
+
+                selectDokter.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Gagal memuat data dokter. Silakan coba lagi.');
+                selectDokter.innerHTML = '<option value="">-- Error loading doctors --</option>';
+            });
+    });
 
     // Event: Saat dokter dipilih
     selectDokter.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
-        const doctorId = selectedOption.getAttribute('data-doctor-id');
-
-        // Reset
-        selectTanggal.value = '';
-        selectTanggal.disabled = true;
+        
         selectTime.value = '';
         selectTime.disabled = true;
         submitBtn.disabled = true;
-        dateError.style.display = 'none';
+        bookedSlotsWarning.style.display = 'none';
 
-        if (!doctorId) {
-            doctorScheduleInfo.style.display = 'none';
+        if (!this.value) {
+            doctorInfo.style.display = 'none';
+            timeRangeInfo.innerHTML = '<i class="bi bi-info-circle"></i> Pilih dokter terlebih dahulu';
             return;
         }
 
-        // Fetch jadwal dokter
-        fetch(`/api/doctor/${doctorId}/schedule`)
+        const startTime = selectedOption.getAttribute('data-start-time');
+        const endTime = selectedOption.getAttribute('data-end-time');
+        const quotaLeft = selectedOption.getAttribute('data-quota-left');
+        const totalQuota = selectedOption.getAttribute('data-total-quota');
+
+        // Tampilkan info dokter
+        practiceHours.innerHTML = `${startTime} - ${endTime}`;
+        quotaInfo.innerHTML = `<span class="badge ${quotaLeft > 5 ? 'bg-success' : 'bg-warning text-dark'}">${quotaLeft}/${totalQuota} tersedia</span>`;
+        doctorInfo.style.display = 'block';
+
+        // Set time constraints
+        selectTime.min = startTime;
+        selectTime.max = endTime;
+        selectTime.disabled = false;
+        timeRangeInfo.innerHTML = `<i class="bi bi-info-circle"></i> Jam praktek: ${startTime} - ${endTime}`;
+
+        currentDoctorData = {
+            name: this.value,
+            startTime: startTime,
+            endTime: endTime
+        };
+
+        // Fetch booked slots
+        const selectedDate = selectTanggal.value;
+        fetch(`/api/booked-slots/${encodeURIComponent(this.value)}/${selectedDate}`)
             .then(response => response.json())
-            .then(schedules => {
-                currentSchedules = schedules;
-
-                // Tampilkan info jadwal
-                if (schedules.length > 0) {
-                    let scheduleHTML = '<ul class="mb-0">';
-                    schedules.forEach(schedule => {
-                        scheduleHTML += `<li><strong>${schedule.day_of_week}</strong>: ${schedule.start_time.substring(0, 5)} - ${schedule.end_time.substring(0, 5)}</li>`;
-                    });
-                    scheduleHTML += '</ul>';
-                    scheduleList.innerHTML = scheduleHTML;
-                    doctorScheduleInfo.style.display = 'block';
-
-                    // Enable date picker
-                    selectTanggal.disabled = false;
-                } else {
-                    doctorScheduleInfo.style.display = 'none';
-                    alert('Dokter ini belum memiliki jadwal praktek');
+            .then(slots => {
+                bookedSlots = slots;
+                if (slots.length > 0) {
+                    bookedSlotsText.innerHTML = `Jam yang sudah dibooking: <strong>${slots.join(', ')}</strong>`;
+                    bookedSlotsWarning.style.display = 'block';
                 }
-
-                // Fetch tanggal tersedia
-                return fetch(`/api/doctor/${doctorId}/available-dates`);
-            })
-            .then(response => response.json())
-            .then(dates => {
-                availableDates = dates.map(d => d.date);
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Gagal memuat data. Silakan coba lagi.');
+                console.error('Error fetching booked slots:', error);
             });
     });
 
-    // Event: Saat tanggal dipilih
-    selectTanggal.addEventListener('change', function() {
-        const selectedDate = this.value;
-        selectTime.value = '';
-        selectTime.disabled = true;
-        dateError.style.display = 'none';
-        submitBtn.disabled = true;
-
-        if (!selectedDate) {
-            return;
-        }
-
-        // Validasi tanggal apakah sesuai jadwal
-        const date = new Date(selectedDate);
-        const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const dayName = dayNames[date.getDay()];
-
-        const schedule = currentSchedules.find(s => s.day_of_week === dayName);
-
-        if (!schedule) {
-            dateError.style.display = 'block';
-            timeRangeInfo.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Dokter tidak praktek di hari ini';
-            return;
-        }
-
-        // Check if date is in available dates
-        if (!availableDates.includes(selectedDate)) {
-            dateError.style.display = 'block';
-            timeRangeInfo.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Kuota penuh untuk tanggal ini';
-            return;
-        }
-
-        // Set time range info
-        const startTime = schedule.start_time.substring(0, 5);
-        const endTime = schedule.end_time.substring(0, 5);
-        
-        selectTime.disabled = false;
-        selectTime.min = startTime;
-        selectTime.max = endTime;
-        
-        timeRangeInfo.innerHTML = `<i class="bi bi-info-circle"></i> Jam praktek: ${startTime} - ${endTime}`;
-    });
-
-    // Event: Saat jam dipilih
+    // Event: Saat jam dipilih - validate
     selectTime.addEventListener('change', function() {
-        if (this.value && selectTanggal.value && selectDokter.value) {
-            submitBtn.disabled = false;
-        } else {
+        const selectedTime = this.value;
+        
+        if (!selectedTime || !currentDoctorData) {
             submitBtn.disabled = true;
+            return;
         }
+
+        // Validasi apakah jam dalam range
+        if (selectedTime < currentDoctorData.startTime || selectedTime > currentDoctorData.endTime) {
+            alert(`Jam harus antara ${currentDoctorData.startTime} - ${currentDoctorData.endTime}`);
+            this.value = '';
+            submitBtn.disabled = true;
+            return;
+        }
+
+        // Validasi apakah jam sudah dibooking
+        if (bookedSlots.includes(selectedTime)) {
+            alert(`Jam ${selectedTime} sudah dibooking oleh pasien lain. Silakan pilih jam lain.`);
+            this.value = '';
+            submitBtn.disabled = true;
+            return;
+        }
+
+        submitBtn.disabled = false;
     });
 
     // Form validation before submit
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
         const selectedDate = selectTanggal.value;
         const selectedTime = selectTime.value;
+        const selectedDokter = selectDokter.value;
 
-        if (!selectedDate || !selectedTime) {
+        if (!selectedDate || !selectedTime || !selectedDokter) {
             e.preventDefault();
             alert('Mohon lengkapi semua data');
             return false;
         }
 
-        // Validate time is within schedule
-        const date = new Date(selectedDate);
-        const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const dayName = dayNames[date.getDay()];
-        const schedule = currentSchedules.find(s => s.day_of_week === dayName);
-
-        if (schedule) {
-            const startTime = schedule.start_time.substring(0, 5);
-            const endTime = schedule.end_time.substring(0, 5);
-
-            if (selectedTime < startTime || selectedTime > endTime) {
+        // Final validation
+        if (currentDoctorData) {
+            if (selectedTime < currentDoctorData.startTime || selectedTime > currentDoctorData.endTime) {
                 e.preventDefault();
-                alert(`Jam kunjungan harus antara ${startTime} - ${endTime}`);
+                alert(`Jam kunjungan harus antara ${currentDoctorData.startTime} - ${currentDoctorData.endTime}`);
                 return false;
             }
+        }
+
+        if (bookedSlots.includes(selectedTime)) {
+            e.preventDefault();
+            alert('Jam yang Anda pilih sudah dibooking oleh pasien lain. Silakan refresh halaman dan pilih jam lain.');
+            return false;
         }
     });
 });

@@ -91,6 +91,21 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">Kuota Pasien Per Hari <span class="text-danger">*</span></label>
+                            <input type="number" 
+                                   name="quota" 
+                                   class="form-control @error('quota') is-invalid @enderror" 
+                                   value="{{ old('quota', $schedule->quota ?? 10) }}" 
+                                   min="1" 
+                                   max="100"
+                                   required>
+                            <small class="text-muted">Maksimal pasien yang bisa booking per hari (1-100)</small>
+                            @error('quota')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" 
                                        type="checkbox" 

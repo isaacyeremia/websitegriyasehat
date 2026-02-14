@@ -19,11 +19,19 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'phone'    => 'required',
+            'login'    => 'required', // Bisa email atau phone
             'password' => 'required',
         ]);
 
-        if (Auth::attempt(['phone' => $credentials['phone'], 'password' => $credentials['password']])) {
+        // Cek apakah login menggunakan email atau phone
+        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $loginData = [
+            $loginType => $credentials['login'],
+            'password' => $credentials['password'],
+        ];
+
+        if (Auth::attempt($loginData)) {
             $request->session()->regenerate();
             
             $user = Auth::user();
@@ -39,8 +47,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'phone' => 'Nomor telepon atau password salah.',
-        ])->onlyInput('phone');
+            'login' => 'Email/Nomor telepon atau password salah.',
+        ])->onlyInput('login');
     }
 
     public function showRegister()
@@ -52,34 +60,43 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'name'     => 'required|string|max:100',
-            'phone'    => 'required|string|unique:users,phone',
+            'phone'    => 'required|string|max:20|unique:users,phone',
+            'nik'      => 'required|string|size:16|unique:users,nik',
             'address'  => 'nullable|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+        ], [
+            'nik.required' => 'NIK/KTP wajib diisi',
+            'nik.size' => 'NIK/KTP harus 16 digit',
+            'nik.unique' => 'NIK/KTP sudah terdaftar',
+            'phone.unique' => 'Nomor telepon sudah terdaftar',
+            'email.unique' => 'Email sudah terdaftar',
         ]);
 
         $user = User::create([
             'name'     => $data['name'],
             'phone'    => $data['phone'],
+            'nik'      => $data['nik'],
             'address'  => $data['address'] ?? null,
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'role'     => 'user', // Hanya user yang bisa register sendiri
+            'role'     => 'user',
         ]);
 
         Auth::login($user);
 
-        return redirect('/home');
+        return redirect('/home')->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name);
     }
 
     public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
-        return redirect('/login');
-    }
+{
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    
+    // Redirect ke homepage, bukan login
+    return redirect('/')->with('success', 'Anda telah logout');
+}
 
     // Forgot Password Functions
     public function showForgotPassword()
@@ -90,12 +107,19 @@ class AuthController extends Controller
     public function sendResetLink(Request $request)
     {
         $request->validate([
-            'phone' => 'required|exists:users,phone'
+            'login' => 'required'
         ], [
-            'phone.exists' => 'Nomor telepon tidak terdaftar.'
+            'login.required' => 'Email atau nomor telepon wajib diisi.'
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        // Cek apakah menggunakan email atau phone
+        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        
+        $user = User::where($loginType, $request->login)->first();
+
+        if (!$user) {
+            return back()->withErrors(['login' => 'Email/Nomor telepon tidak terdaftar.']);
+        }
 
         // Generate token 6 digit
         $token = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -104,15 +128,20 @@ class AuthController extends Controller
         $user->reset_token_expires_at = Carbon::now()->addMinutes(30);
         $user->save();
 
-        // Simpan token di session untuk verifikasi
-        session(['reset_phone' => $request->phone, 'reset_token' => $token]);
+        // Simpan di session
+        session([
+            'reset_identifier' => $request->login,
+            'reset_token' => $token,
+            'reset_type' => $loginType
+        ]);
 
-        return redirect()->route('password.verify')->with('success', 'Kode verifikasi Anda: ' . $token);
+        return redirect()->route('password.verify')
+                        ->with('success', 'Kode verifikasi Anda: ' . $token . ' (berlaku 30 menit)');
     }
 
     public function showVerifyToken()
     {
-        if (!session('reset_phone')) {
+        if (!session('reset_identifier')) {
             return redirect()->route('password.request');
         }
 
@@ -125,15 +154,17 @@ class AuthController extends Controller
             'token' => 'required|digits:6'
         ]);
 
-        $phone = session('reset_phone');
-        $user = User::where('phone', $phone)->first();
+        $identifier = session('reset_identifier');
+        $loginType = session('reset_type');
+        
+        $user = User::where($loginType, $identifier)->first();
 
         if (!$user || !$user->reset_token || Carbon::now()->greaterThan($user->reset_token_expires_at)) {
             return back()->withErrors(['token' => 'Kode verifikasi tidak valid atau sudah kadaluarsa.']);
         }
 
         if (Hash::check($request->token, $user->reset_token)) {
-            session(['verified_phone' => $phone]);
+            session(['verified_identifier' => $identifier, 'verified_type' => $loginType]);
             return redirect()->route('password.reset');
         }
 
@@ -142,7 +173,7 @@ class AuthController extends Controller
 
     public function showResetPassword()
     {
-        if (!session('verified_phone')) {
+        if (!session('verified_identifier')) {
             return redirect()->route('password.request');
         }
 
@@ -155,8 +186,10 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $phone = session('verified_phone');
-        $user = User::where('phone', $phone)->first();
+        $identifier = session('verified_identifier');
+        $loginType = session('verified_type');
+        
+        $user = User::where($loginType, $identifier)->first();
 
         if (!$user) {
             return redirect()->route('password.request')->withErrors(['error' => 'Terjadi kesalahan.']);
@@ -168,7 +201,7 @@ class AuthController extends Controller
         $user->save();
 
         // Clear sessions
-        session()->forget(['reset_phone', 'reset_token', 'verified_phone']);
+        session()->forget(['reset_identifier', 'reset_token', 'reset_type', 'verified_identifier', 'verified_type']);
 
         return redirect()->route('login')->with('success', 'Password berhasil diubah. Silakan login.');
     }

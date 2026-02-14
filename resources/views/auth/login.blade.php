@@ -16,24 +16,41 @@
       </div>
     @endif
 
+    @if(session('error'))
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+
     <form method="POST" action="/login">
       @csrf
 
       <div class="mb-3">
-        <label class="form-label">Nomor Telepon</label>
-        <input type="text" name="phone" value="{{ old('phone') }}" class="form-control" placeholder="0812xxxx" required>
-        @error('phone')<div class="text-danger small">{{ $message }}</div>@enderror
+        <label class="form-label">Email atau Nomor Telepon</label>
+        <input type="text" 
+               name="login" 
+               value="{{ old('login') }}" 
+               class="form-control @error('login') is-invalid @enderror" 
+               placeholder="contoh@email.com atau 0812xxxx" 
+               required>
+        @error('login')
+          <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+        <small class="text-muted">Anda bisa login dengan email atau nomor telepon</small>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Password</label>
         <div class="input-group">
-          <input id="password-field" type="password" name="password" class="form-control" placeholder="Masukkan password" required>
-          <button type="button" class="btn input-eye" onclick="togglePassword()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/>
-              <path d="M8 5.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z" fill="#fff"/>
-            </svg>
+          <input id="password-field" 
+                 type="password" 
+                 name="password" 
+                 class="form-control" 
+                 placeholder="Masukkan password" 
+                 required>
+          <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+            <i class="bi bi-eye" id="eye-icon"></i>
           </button>
         </div>
       </div>
@@ -46,18 +63,28 @@
         <button class="btn btn-primary-custom">Login</button>
       </div>
 
-      <div class="small-muted">
+      <div class="small-muted text-center">
         Belum punya akun? <a href="{{ route('register') }}">Daftar</a>
       </div>
     </form>
   </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 @push('scripts')
 <script>
   function togglePassword(){
-    const f = document.getElementById('password-field');
-    f.type = (f.type === 'password') ? 'text' : 'password';
+    const field = document.getElementById('password-field');
+    const icon = document.getElementById('eye-icon');
+    
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.className = 'bi bi-eye-slash';
+    } else {
+      field.type = 'password';
+      icon.className = 'bi bi-eye';
+    }
   }
 </script>
 @endpush

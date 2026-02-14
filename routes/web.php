@@ -14,11 +14,9 @@ use App\Http\Controllers\Terapis\PatientManagementController;
 // ROOT / HOMEPAGE - Tampilkan home.blade.php
 // ============================================================
 Route::get('/', function () {
-    // Jika user sudah login, tampilkan home
     if (auth()->check()) {
         return view('home');
     }
-    // Jika guest, tetap tampilkan home (atau bisa redirect ke login jika Anda mau)
     return view('home');
 })->name('welcome');
 
@@ -31,14 +29,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     
-    // ========== FORGOT PASSWORD ROUTES (TAMBAHAN BARU) ==========
+    // FORGOT PASSWORD ROUTES
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.send');
     Route::get('/verify-token', [AuthController::class, 'showVerifyToken'])->name('password.verify');
     Route::post('/verify-token', [AuthController::class, 'verifyToken'])->name('password.verify.submit');
     Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
-    // ========== END FORGOT PASSWORD ROUTES ==========
 });
 
 // ============================================================
@@ -76,9 +73,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/antrian/{id}/confirm-arrival', [AntrianController::class, 'confirmArrival'])->name('booking.confirm-arrival');
     Route::post('/antrian/{id}/cancel-arrival', [AntrianController::class, 'cancelArrival'])->name('booking.cancel-arrival');
     
-    // API routes for AJAX
+    // API routes for AJAX - NEW ENDPOINTS
     Route::get('/api/doctor/{id}/schedule', [AntrianController::class, 'getDoctorSchedule'])->name('api.doctor.schedule');
     Route::get('/api/doctor/{id}/available-dates', [AntrianController::class, 'getAvailableDates'])->name('api.doctor.dates');
+    Route::get('/api/available-doctors/{date}', [AntrianController::class, 'getAvailableDoctors'])->name('api.available.doctors');
+    Route::get('/api/booked-slots/{doctorName}/{date}', [AntrianController::class, 'getBookedSlots'])->name('api.booked.slots');
 });
 
 // ============================================================
@@ -121,6 +120,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/patients/{patientId}/medical-record/create', [AdminController::class, 'createMedicalRecord'])->name('medical-records.create');
     Route::post('/patients/{patientId}/medical-record', [AdminController::class, 'storeMedicalRecord'])->name('medical-records.store');
     Route::get('/medical-records/{recordId}', [AdminController::class, 'showMedicalRecord'])->name('medical-records.show');
+    
+    // All Medical Records View (NEW)
+    Route::get('/all-medical-records', [AdminController::class, 'allMedicalRecords'])->name('medical-records.all');
 
     // Manajemen Produk Apotek (Admin)
     Route::get('/pharmacy', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'index'])->name('pharmacy.index');

@@ -22,11 +22,19 @@ class TerapisAuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'phone'    => 'required',
+            'login'    => 'required', // Bisa email atau phone
             'password' => 'required',
         ]);
 
-        if (Auth::attempt(['phone' => $credentials['phone'], 'password' => $credentials['password']])) {
+        // Cek apakah login menggunakan email atau phone
+        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $loginData = [
+            $loginType => $credentials['login'],
+            'password' => $credentials['password'],
+        ];
+
+        if (Auth::attempt($loginData)) {
             if (Auth::user()->canManagePatients()) {
                 $request->session()->regenerate();
                 return redirect()->route('terapis.dashboard');
@@ -34,13 +42,13 @@ class TerapisAuthController extends Controller
             
             Auth::logout();
             return back()->withErrors([
-                'phone' => 'Akses ditolak. Anda bukan terapis atau admin.',
-            ])->onlyInput('phone');
+                'login' => 'Akses ditolak. Anda bukan terapis atau admin.',
+            ])->onlyInput('login');
         }
 
         return back()->withErrors([
-            'phone' => 'Nomor telepon atau password salah.',
-        ])->onlyInput('phone');
+            'login' => 'Email/Nomor telepon atau password salah.',
+        ])->onlyInput('login');
     }
 
     public function showRegister()
@@ -81,10 +89,15 @@ class TerapisAuthController extends Controller
         $data = $request->validate([
             'name'     => 'required|string|max:255',
             'phone'    => 'required|string|unique:users,phone',
+            'nik'      => 'required|string|size:16|unique:users,nik',
             'address'  => 'nullable|string',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'terapis_code' => 'required|string',
+        ], [
+            'nik.required' => 'NIK/KTP wajib diisi',
+            'nik.size' => 'NIK/KTP harus 16 digit',
+            'nik.unique' => 'NIK/KTP sudah terdaftar',
         ]);
 
         if (!str_starts_with($data['terapis_code'], 'TRP-')) {
@@ -96,6 +109,7 @@ class TerapisAuthController extends Controller
         $user = User::create([
             'name'     => $data['name'],
             'phone'    => $data['phone'],
+            'nik'      => $data['nik'],
             'address'  => $data['address'] ?? null,
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
@@ -113,6 +127,6 @@ class TerapisAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return redirect()->route('terapis.login');
+        return redirect('/')->with('success', 'Terapis telah logout');
     }
 }

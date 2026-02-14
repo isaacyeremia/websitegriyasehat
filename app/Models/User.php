@@ -12,87 +12,62 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'phone',
+        'nik',
+        'address',
         'email',
         'password',
-        'phone',
-        'address',
         'role',
+        'reset_token',
+        'reset_token_expires_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'reset_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'reset_token_expires_at' => 'datetime',
+    ];
 
-    /**
-     * Relasi ke Patient Histories
-     */
-    public function patientHistories()
-    {
-        return $this->hasMany(PatientHistory::class, 'user_id');
-    }
-
-    /**
-     * Relasi ke Medical Records sebagai Patient
-     */
-    public function medicalRecords()
-    {
-        return $this->hasMany(MedicalRecord::class, 'patient_id');
-    }
-
-    /**
-     * Relasi ke Medical Records sebagai Terapis
-     */
-    public function medicalRecordsAsTerapis()
-    {
-        return $this->hasMany(MedicalRecord::class, 'terapis_id');
-    }
-
-    /**
-     * Alias untuk terapisMedicalRecords (backward compatibility)
-     */
-    public function terapisMedicalRecords()
-    {
-        return $this->medicalRecordsAsTerapis();
-    }
-
-    /**
-     * Check if user can manage patients (Admin or Terapis)
-     */
-    public function canManagePatients()
-    {
-        return in_array($this->role, ['admin', 'terapis']);
-    }
-
-    /**
-     * Check if user is admin
-     */
+    // Role methods
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Check if user is terapis
-     */
     public function isTerapis()
     {
         return $this->role === 'terapis';
     }
 
-    /**
-     * Check if user is regular user/patient
-     */
     public function isUser()
     {
         return $this->role === 'user';
+    }
+
+    public function canManagePatients()
+    {
+        return $this->role === 'admin' || $this->role === 'terapis';
+    }
+
+    // Relationships
+    public function patientHistories()
+    {
+        return $this->hasMany(PatientHistory::class);
+    }
+
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecord::class, 'patient_id');
+    }
+
+    public function medicalRecordsAsTerapis()
+    {
+        return $this->hasMany(MedicalRecord::class, 'terapis_id');
     }
 }

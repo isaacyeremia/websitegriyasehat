@@ -18,6 +18,15 @@
       </div>
     @endif
 
+    @if($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show">
+        @foreach($errors->all() as $error)
+          {{ $error }}
+        @endforeach
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    @endif
+
     <p class="text-center small text-muted mb-4">
       Masukkan kode verifikasi 6 digit yang ditampilkan di atas
     </p>
@@ -27,9 +36,17 @@
 
       <div class="mb-3">
         <label class="form-label">Kode Verifikasi</label>
-        <input type="text" name="token" maxlength="6" class="form-control text-center" 
-               placeholder="000000" required style="letter-spacing: 0.5em; font-size: 1.5rem;">
-        @error('token')<div class="text-danger small">{{ $message }}</div>@enderror
+        <input type="text" 
+               name="token" 
+               maxlength="6" 
+               class="form-control text-center @error('token') is-invalid @enderror" 
+               placeholder="000000" 
+               required 
+               style="letter-spacing: 0.5em; font-size: 1.5rem;"
+               autofocus>
+        @error('token')
+          <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
       </div>
 
       <div class="d-grid mb-3">
@@ -43,11 +60,22 @@
   </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 @push('scripts')
 <script>
   // Auto-format input to numbers only
-  document.querySelector('input[name="token"]').addEventListener('input', function(e) {
+  const tokenInput = document.querySelector('input[name="token"]');
+  
+  tokenInput.addEventListener('input', function(e) {
     this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  // Auto submit when 6 digits entered (optional)
+  tokenInput.addEventListener('input', function(e) {
+    if (this.value.length === 6) {
+      this.form.submit();
+    }
   });
 </script>
 @endpush

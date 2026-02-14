@@ -14,34 +14,47 @@
       Masukkan password baru untuk akun Anda
     </p>
 
+    @if($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show">
+        @foreach($errors->all() as $error)
+          {{ $error }}
+        @endforeach
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    @endif
+
     <form method="POST" action="{{ route('password.update') }}">
       @csrf
 
       <div class="mb-3">
         <label class="form-label">Password Baru</label>
         <div class="input-group">
-          <input id="password-field" type="password" name="password" class="form-control" 
-                 placeholder="Minimal 6 karakter" required>
-          <button type="button" class="btn input-eye" onclick="togglePassword('password-field')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/>
-              <path d="M8 5.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z" fill="#fff"/>
-            </svg>
+          <input id="password-field" 
+                 type="password" 
+                 name="password" 
+                 class="form-control @error('password') is-invalid @enderror" 
+                 placeholder="Minimal 6 karakter" 
+                 required>
+          <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password-field', 'eye-icon-1')">
+            <i class="bi bi-eye" id="eye-icon-1"></i>
           </button>
         </div>
-        @error('password')<div class="text-danger small">{{ $message }}</div>@enderror
+        @error('password')
+          <div class="text-danger small mt-1">{{ $message }}</div>
+        @enderror
       </div>
 
       <div class="mb-3">
         <label class="form-label">Konfirmasi Password</label>
         <div class="input-group">
-          <input id="password-confirm-field" type="password" name="password_confirmation" 
-                 class="form-control" placeholder="Ulangi password" required>
-          <button type="button" class="btn input-eye" onclick="togglePassword('password-confirm-field')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/>
-              <path d="M8 5.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z" fill="#fff"/>
-            </svg>
+          <input id="password-confirm-field" 
+                 type="password" 
+                 name="password_confirmation" 
+                 class="form-control" 
+                 placeholder="Ulangi password" 
+                 required>
+          <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password-confirm-field', 'eye-icon-2')">
+            <i class="bi bi-eye" id="eye-icon-2"></i>
           </button>
         </div>
       </div>
@@ -57,11 +70,21 @@
   </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 @push('scripts')
 <script>
-  function togglePassword(fieldId) {
-    const f = document.getElementById(fieldId);
-    f.type = (f.type === 'password') ? 'text' : 'password';
+  function togglePassword(fieldId, iconId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(iconId);
+    
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.className = 'bi bi-eye-slash';
+    } else {
+      field.type = 'password';
+      icon.className = 'bi bi-eye';
+    }
   }
 </script>
 @endpush

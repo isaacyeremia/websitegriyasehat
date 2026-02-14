@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0">📅 Manajemen Jadwal Praktek</h2>
-            <p class="text-muted">Kelola jadwal praktek dokter/terapis</p>
+            <p class="text-muted">Kelola jadwal praktek dan kuota dokter/terapis</p>
         </div>
         <div>
             <a href="{{ route('admin.schedules.create') }}" class="btn btn-success me-2">
@@ -48,6 +48,7 @@
                                 <th>Dokter/Terapis</th>
                                 <th>Hari</th>
                                 <th>Jam Praktek</th>
+                                <th>Kuota</th>
                                 <th>Status</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
@@ -67,6 +68,11 @@
                                         <i class="bi bi-clock"></i> 
                                         {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
                                         {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $schedule->quota >= 10 ? 'bg-success' : 'bg-warning text-dark' }}">
+                                            {{ $schedule->quota ?? 10 }} pasien/hari
+                                        </span>
                                     </td>
                                     <td>
                                         <form method="POST" action="{{ route('admin.schedules.toggle', $schedule->id) }}" class="d-inline">

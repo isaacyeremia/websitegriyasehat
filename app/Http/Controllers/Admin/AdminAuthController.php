@@ -24,11 +24,19 @@ class AdminAuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'phone'    => 'required',
+            'login'    => 'required', // Bisa email atau phone
             'password' => 'required',
         ]);
 
-        if (Auth::attempt(['phone' => $credentials['phone'], 'password' => $credentials['password']])) {
+        // Cek apakah login menggunakan email atau phone
+        $loginType = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $loginData = [
+            $loginType => $credentials['login'],
+            'password' => $credentials['password'],
+        ];
+
+        if (Auth::attempt($loginData)) {
             // Cek apakah user adalah admin
             if (Auth::user()->isAdmin()) {
                 $request->session()->regenerate();
@@ -38,13 +46,13 @@ class AdminAuthController extends Controller
             // Jika bukan admin, logout dan tampilkan error
             Auth::logout();
             return back()->withErrors([
-                'phone' => 'Akses ditolak. Anda bukan admin.',
-            ])->onlyInput('phone');
+                'login' => 'Akses ditolak. Anda bukan admin.',
+            ])->onlyInput('login');
         }
 
         return back()->withErrors([
-            'phone' => 'Nomor telepon atau password salah.',
-        ])->onlyInput('phone');
+            'login' => 'Email/Nomor telepon atau password salah.',
+        ])->onlyInput('login');
     }
 
     // Tampilkan halaman register admin
@@ -78,10 +86,15 @@ class AdminAuthController extends Controller
         $data = $request->validate([
             'name'     => 'required|string|max:255',
             'phone'    => 'required|string|unique:users,phone',
+            'nik'      => 'required|string|size:16|unique:users,nik',
             'address'  => 'nullable|string',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'admin_code' => 'required|string',
+        ], [
+            'nik.required' => 'NIK/KTP wajib diisi',
+            'nik.size' => 'NIK/KTP harus 16 digit',
+            'nik.unique' => 'NIK/KTP sudah terdaftar',
         ]);
 
         // Validasi format kode admin (harus dimulai dengan ADM-)
@@ -94,6 +107,7 @@ class AdminAuthController extends Controller
         $user = User::create([
             'name'     => $data['name'],
             'phone'    => $data['phone'],
+            'nik'      => $data['nik'],
             'address'  => $data['address'] ?? null,
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
@@ -112,6 +126,6 @@ class AdminAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return redirect()->route('admin.login');
+        return redirect('/')->with('success', 'Admin telah logout');
     }
 }
