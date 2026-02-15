@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title','Griya Sehat')</title>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="shortcut icon" type="image/png" href="/logo.png">
+
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
@@ -12,63 +16,205 @@
   <!-- Custom CSS -->
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
-  <!-- ✅ FIX NAVBAR POSITIONING - ULTIMATE FIX -->
   <style>
-    /* FORCE NAVBAR TO TOP - PRIORITAS TERTINGGI */
-    nav.navbar,
+    /* ===== NAVBAR FIXED TOP ===== */
     .navbar {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
-        z-index: 99999 !important;
+        z-index: 9999 !important;
         background-color: white !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-        margin: 0 !important;
+        padding: 0.75rem 0 !important;
     }
     
-    /* Beri margin untuk main agar tidak tertutup navbar */
+    /* Main content margin */
     main {
-        margin-top: 80px !important;
-        position: relative !important;
-        z-index: 1 !important;
+        margin-top: 70px !important;
     }
     
-    /* Card dan form tidak boleh menutupi navbar */
+    /* Brand Logo */
+    .brand-logo {
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .brand-logo:hover {
+        color: #8B4513;
+    }
+
+    /* Custom Burger Icon */
+    .navbar-toggler {
+        border: 1px solid rgba(0,0,0,.1);
+        padding: 0.5rem;
+        background-color: transparent;
+        cursor: pointer;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* Burger Lines */
+    .navbar-toggler-icon {
+        display: block;
+        width: 25px;
+        height: 2px;
+        background-color: #333;
+        position: relative;
+        transition: all 0.3s;
+    }
+
+    .navbar-toggler-icon::before,
+    .navbar-toggler-icon::after {
+        content: '';
+        display: block;
+        width: 25px;
+        height: 2px;
+        background-color: #333;
+        position: absolute;
+        left: 0;
+        transition: all 0.3s;
+    }
+
+    .navbar-toggler-icon::before {
+        top: -8px;
+    }
+
+    .navbar-toggler-icon::after {
+        top: 8px;
+    }
+
+    /* Desktop View */
+    @media (min-width: 992px) {
+        .navbar-toggler {
+            display: none !important;
+        }
+
+        .navbar-collapse {
+            display: flex !important;
+            flex-basis: auto;
+        }
+
+        .navbar-nav-center {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .navbar-nav-center a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav-center a:hover {
+            color: #8B4513;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-actions .user-info {
+            margin-right: 0.5rem;
+        }
+    }
+
+    /* Mobile View */
+    @media (max-width: 991px) {
+        .navbar-collapse {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .navbar-collapse.show {
+            display: block !important;
+        }
+
+        .navbar-collapse:not(.show) {
+            display: none !important;
+        }
+
+        .navbar-nav-center {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .navbar-nav-center a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: block;
+            width: 100%;
+        }
+
+        .navbar-nav-center a:last-child {
+            border-bottom: none;
+        }
+
+        .navbar-nav-center a:hover {
+            background-color: #f8f9fa;
+            color: #8B4513;
+        }
+
+        .navbar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .navbar-actions .user-info {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            display: block;
+            width: 100%;
+        }
+
+        .navbar-actions .btn,
+        .navbar-actions form,
+        .navbar-actions form button {
+            width: 100%;
+        }
+    }
+
+    /* Card, Modal, etc */
     .card,
     .card-auth {
         position: relative !important;
         z-index: 1 !important;
     }
     
-    /* Container */
-    .container,
-    .container-fluid {
-        position: relative !important;
-        z-index: 1 !important;
-    }
-    
-    /* Center screen untuk halaman login/register */
     .center-screen {
         position: relative !important;
         z-index: 1 !important;
         margin-top: 100px !important;
     }
-    
-    /* Body */
-    body {
-        position: relative !important;
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
-    
-    /* Dropdown navbar jika ada */
-    .navbar .dropdown-menu {
-        z-index: 100000 !important;
-    }
-    
-    /* Modal backdrop dan dialog */
+
     .modal-backdrop {
         z-index: 1040 !important;
     }
@@ -82,48 +228,59 @@
 <body>
 
   {{-- NAVBAR --}}
-  <nav class="navbar">
+  <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="brand-logo d-flex align-items-center gap-2" href="{{ url('/') }}">
-        <img src="{{ asset('logo.png') }}" alt="logo" style="height:44px;">
-        <span>Griya Sehat UKDC</span>
+      {{-- Logo/Brand --}}
+      <a class="brand-logo" href="{{ url('/') }}">
+        <img src="{{ asset('logo.png') }}" alt="logo" style="height:40px;">
+        <span class="d-none d-sm-inline">Griya Sehat UKDC</span>
       </a>
 
-      {{-- MENU TENGAH --}}
+      {{-- Burger Button (Only on mobile and not on login/register) --}}
       @if (!request()->is('login') && !request()->is('register'))
-      <div class="nav-menu">
-        <a href="{{ url('/') }}">Beranda</a>
-        <a href="{{ route('profile') }}">Profile</a>
-        <a href="{{ route('apotek.index') }}">Katalog</a>
-        
-        {{-- Link Dashboard Admin (hanya muncul jika user adalah admin) --}}
-        @auth
-          @if(Auth::user()->isAdmin())
-            <a href="{{ route('admin.dashboard') }}" class="text-danger fw-bold">
-              <i class="bi bi-speedometer2"></i> Dashboard Admin
-            </a>
-          @endif
-        @endauth
-      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
       @endif
 
-      {{-- ACTION --}}
-      <div class="nav-actions">
-        @auth
-          <span class="me-3 text-muted">
-            Halo, <strong>{{ Auth::user()->name }}</strong>
+      {{-- Collapsible Menu --}}
+      <div class="collapse navbar-collapse" id="navbarMenu">
+        {{-- Center Menu (Beranda, Profile, Katalog) --}}
+        @if (!request()->is('login') && !request()->is('register'))
+        <div class="navbar-nav-center">
+          <a href="{{ url('/') }}">Beranda</a>
+          <a href="{{ route('profile') }}">Profile</a>
+          <a href="{{ route('apotek.index') }}">Katalog</a>
+          
+          {{-- Admin Dashboard Link --}}
+          @auth
             @if(Auth::user()->isAdmin())
-              <span class="badge bg-danger ms-1">Admin</span>
+              <a href="{{ route('admin.dashboard') }}" class="text-danger fw-bold">
+                <i class="bi bi-speedometer2"></i> Dashboard Admin
+              </a>
             @endif
-          </span>
-          <form method="POST" action="{{ route('logout') }}" class="d-inline">
-            @csrf
-            <button class="btn btn-outline-brown">Logout</button>
-          </form>
-        @else
-          <a href="{{ route('login') }}" class="btn btn-outline-brown">Login</a>
-          <a href="{{ route('register') }}" class="btn btn-brown">Daftar</a>
-        @endauth
+          @endauth
+        </div>
+        @endif
+
+        {{-- Right Side Actions (Login/Logout) --}}
+        <div class="navbar-actions ms-lg-auto">
+          @auth
+            <span class="user-info text-muted">
+              Halo, <strong>{{ Auth::user()->name }}</strong>
+              @if(Auth::user()->isAdmin())
+                <span class="badge bg-danger ms-1">Admin</span>
+              @endif
+            </span>
+            <form method="POST" action="{{ route('logout') }}">
+              @csrf
+              <button class="btn btn-outline-brown">Logout</button>
+            </form>
+          @else
+            <a href="{{ route('login') }}" class="btn btn-outline-brown">Login</a>
+            <a href="{{ route('register') }}" class="btn btn-brown">Daftar</a>
+          @endauth
+        </div>
       </div>
     </div>
   </nav>
@@ -140,33 +297,37 @@
     @include('components.footer-full')
   @endif
 
-  <!-- Bootstrap JS -->
+  <!-- Bootstrap JS Bundle (includes Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  {{-- Script dari halaman --}}
+  {{-- Custom Scripts --}}
   @stack('scripts')
 
-  {{-- JavaScript Backup - Force Navbar Position --}}
   <script>
-    // Force navbar ke atas dengan JavaScript (backup jika CSS gagal)
     document.addEventListener('DOMContentLoaded', function() {
-      const navbar = document.querySelector('nav.navbar');
+      // Force navbar position
+      const navbar = document.querySelector('.navbar');
       if (navbar) {
         navbar.style.position = 'fixed';
         navbar.style.top = '0';
-        navbar.style.left = '0';
-        navbar.style.right = '0';
-        navbar.style.width = '100%';
-        navbar.style.zIndex = '99999';
-        navbar.style.backgroundColor = 'white';
-        navbar.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        navbar.style.zIndex = '9999';
       }
+
+      // Auto-close menu on link click (mobile)
+      const navLinks = document.querySelectorAll('.navbar-nav-center a');
+      const navbarCollapse = document.getElementById('navbarMenu');
       
-      const main = document.querySelector('main');
-      if (main) {
-        main.style.marginTop = '80px';
-        main.style.position = 'relative';
-        main.style.zIndex = '1';
+      if (navbarCollapse && navLinks.length > 0) {
+        navLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            if (window.innerWidth < 992) {
+              const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+              if (bsCollapse) {
+                bsCollapse.hide();
+              }
+            }
+          });
+        });
       }
     });
   </script>
