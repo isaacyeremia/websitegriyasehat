@@ -45,6 +45,10 @@
                             <td>: <strong>{{ $pasien->name }}</strong></td>
                         </tr>
                         <tr>
+                            <th>NIK/KTP</th>
+                            <td>: {{ $pasien->nik ?? '-' }}</td>
+                        </tr>
+                        <tr>
                             <th>Email</th>
                             <td>: {{ $pasien->email }}</td>
                         </tr>
@@ -79,9 +83,7 @@
             {{-- Tombol Input Rekam Medis & Hapus --}}
             <hr>
             <div class="d-flex gap-2">
-                <a href="{{ route('admin.medical-records.create', $pasien->id) }}" class="btn btn-success">
-                    <i class="bi bi-plus-circle"></i> Input Rekam Medis Baru
-                </a>
+                
                 
                 <form method="POST" action="{{ route('admin.patients.destroy', $pasien->id) }}" onsubmit="return confirm('⚠️ PERHATIAN!\n\nHapus data pasien {{ $pasien->name }}?\n\nSemua riwayat kunjungan dan rekam medis akan TERHAPUS PERMANEN!\n\nApakah Anda yakin?')" class="d-inline">
                     @csrf

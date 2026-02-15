@@ -537,3 +537,73 @@ body {
   padding: 20px 0;
   margin-top: 40px;
 }
+
+/* ========================================================================
+   ⭐ NAVBAR FIX - HARUS PALING BAWAH AGAR OVERRIDE SEMUA CSS DI ATAS ⭐
+   ======================================================================== */
+
+/* ULTIMATE NAVBAR FIX - Navbar selalu di atas dengan z-index tertinggi */
+nav.navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 99999 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    margin: 0 !important;
+}
+
+/* Beri space di bawah navbar agar content tidak tertutup */
+main {
+    margin-top: 80px !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Card dan form tidak boleh menutupi navbar */
+.card {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+.card-auth {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* Modal tetap di atas card tapi di bawah navbar */
+.modal {
+    z-index: 1040 !important;
+}
+
+.modal-backdrop {
+    z-index: 1030 !important;
+}
+
+/* Container */
+.container,
+.container-fluid {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Center screen untuk login/register */
+.center-screen {
+    margin-top: 100px !important;
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* Pastikan body tidak ada padding/margin yang aneh */
+body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Hero section perlu space tambahan karena navbar fixed */
+.hero-outer {
+    margin-top: 0 !important;
+    padding-top: 70px !important;
+}

@@ -39,6 +39,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Pasien</th>
+                            <th>NIK</th>
                             <th>Email</th>
                             <th>Telepon</th>
                             <th>Alamat</th>
@@ -48,46 +49,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($pasiens as $index => $pasien)
-                            <tr>
-                                <td>{{ $pasiens->firstItem() + $index }}</td>
-                                <td><strong>{{ $pasien->name }}</strong></td>
-                                <td>{{ $pasien->email }}</td>
-                                <td>{{ $pasien->phone }}</td>
-                                <td>{{ Str::limit($pasien->address ?? '-', 30) }}</td>
-                                <td>
-                                    <span class="badge bg-info">{{ $pasien->patient_histories_count }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">{{ $pasien->medical_records_count }}</span>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.patients.show', $pasien->id) }}" class="btn btn-info" title="Detail">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.patients.edit', $pasien->id) }}" class="btn btn-warning" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form method="POST" action="{{ route('admin.patients.destroy', $pasien->id) }}" onsubmit="return confirm('Yakin hapus data pasien {{ $pasien->name }}? Semua riwayat dan rekam medis akan terhapus!')" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-1"></i>
-                                    <p>Belum ada data pasien</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+    @forelse($pasiens as $index => $pasien)
+        <tr>
+            <td>{{ $pasiens->firstItem() + $index }}</td>
+            <td><strong>{{ $pasien->name }}</strong></td>
+            <td>{{ $pasien->nik ?? '-' }}</td>
+            <td>{{ $pasien->email }}</td>
+            <td>{{ $pasien->phone }}</td>
+            <td>{{ Str::limit($pasien->address ?? '-', 30) }}</td>
+            <td>
+                <span class="badge bg-info">{{ $pasien->patient_histories_count }}</span>
+            </td>
+            <td>
+                <span class="badge bg-success">{{ $pasien->medical_records_count }}</span>
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <a href="{{ route('admin.patients.show', $pasien->id) }}" class="btn btn-info" title="Detail">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{{ route('admin.patients.edit', $pasien->id) }}" class="btn btn-warning" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form method="POST" action="{{ route('admin.patients.destroy', $pasien->id) }}" onsubmit="return confirm('Yakin hapus data pasien {{ $pasien->name }}? Semua riwayat dan rekam medis akan terhapus!')" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger" title="Hapus">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p>Belum ada data pasien</p>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
                 </table>
             </div>
 
@@ -109,9 +111,10 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
     
     tableRows.forEach(row => {
         const name = row.cells[1]?.textContent.toLowerCase() || '';
-        const email = row.cells[2]?.textContent.toLowerCase() || '';
+        const nik = row.cells[2]?.textContent.toLowerCase() || '';
+        const email = row.cells[3]?.textContent.toLowerCase() || '';
         
-        if (name.includes(searchValue) || email.includes(searchValue)) {
+        if (name.includes(searchValue) || nik.includes(searchValue) || email.includes(searchValue)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';

@@ -137,19 +137,23 @@ class PatientManagementController extends Controller
     }
 
     public function updatePatient(Request $request, $id)
-    {
-        $pasien = User::where('role', 'user')->findOrFail($id);
+{
+    $pasien = User::where('role', 'user')->findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|unique:users,phone,' . $id,
-            'email' => 'required|email|unique:users,email,' . $id,
-            'address' => 'nullable|string',
-        ]);
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'nik' => 'nullable|string|size:16|unique:users,nik,' . $id,
+        'phone' => 'required|string|unique:users,phone,' . $id,
+        'email' => 'required|email|unique:users,email,' . $id,
+        'address' => 'nullable|string',
+    ], [
+        'nik.size' => 'NIK harus 16 digit',
+        'nik.unique' => 'NIK sudah terdaftar',
+    ]);
 
-        $pasien->update($validated);
+    $pasien->update($validated);
 
-        return redirect()->route('terapis.patients.show', $id)
-                        ->with('success', 'Data pasien berhasil diupdate');
-    }
+    return redirect()->route('terapis.patients.show', $id)
+                    ->with('success', 'Data pasien berhasil diupdate');
+}
 }

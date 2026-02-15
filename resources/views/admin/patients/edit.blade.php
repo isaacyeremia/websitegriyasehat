@@ -52,6 +52,21 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">NIK/KTP</label>
+                            <input type="text" 
+                                    name="nik" 
+                                    class="form-control @error('nik') is-invalid @enderror" 
+                                    value="{{ old('nik', $pasien->nik) }}" 
+                                    maxlength="16"
+                                    pattern="[0-9]{16}"
+                                    placeholder="16 digit NIK">
+                            @error('nik')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">16 digit NIK sesuai KTP (opsional)</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" 
                                    name="email" 
@@ -111,4 +126,11 @@
 </div>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+@push('scripts')
+<script>
+document.querySelector('input[name="nik"]')?.addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+</script>
 @endsection

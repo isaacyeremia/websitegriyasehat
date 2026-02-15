@@ -85,6 +85,7 @@
                                     <tr>
                                         <th>Kode Antrian</th>
                                         <th>Nama Pasien</th>
+                                        <th>NIK</th>
                                         <th>Layanan</th>
                                         <th>Dokter</th>
                                         <th>Tanggal</th>
@@ -93,26 +94,27 @@
                                 </thead>
                                 <tbody>
                                     @foreach($recentQueues as $queue)
-                                        <tr>
-                                            <td><strong>{{ $queue->kode_antrian }}</strong></td>
-                                            <td>{{ $queue->patient_name }}</td>
-                                            <td>{{ $queue->service }}</td>
-                                            <td>{{ $queue->dokter }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
-                                            <td>
-                                                @if($queue->status == 'Menunggu')
-                                                    <span class="badge bg-warning text-dark">Menunggu</span>
-                                                @elseif($queue->status == 'Sedang Dilayani')
-                                                    <span class="badge bg-info">Sedang Dilayani</span>
-                                                @elseif($queue->status == 'Selesai')
-                                                    <span class="badge bg-success">Selesai</span>
-                                                @else
-                                                    <span class="badge bg-secondary">{{ $queue->status }}</span>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                <tr>
+                                    <td><strong>{{ $queue->kode_antrian }}</strong></td>
+                                    <td>{{ $queue->patient_name }}</td>
+                                    <td>{{ $queue->patient_nik ?? '-' }}</td>
+                                    <td>{{ $queue->poli }}</td>
+                                    <td>{{ $queue->dokter }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
+                                        <td>
+                                            @if($queue->status == 'Menunggu')
+                                                <span class="badge bg-warning text-dark">Menunggu</span>
+                                            @elseif($queue->status == 'Sedang Dilayani')
+                                                <span class="badge bg-info">Sedang Dilayani</span>
+                                            @elseif($queue->status == 'Selesai')
+                                                <span class="badge bg-success">Selesai</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $queue->status }}</span>
+                                            @endif
+                                        </td>
+                                </tr>
                                     @endforeach
-                                </tbody>
+                            </tbody>
                             </table>
                         </div>
                     @else

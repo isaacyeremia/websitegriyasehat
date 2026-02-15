@@ -128,19 +128,25 @@ class AntrianController extends Controller
         // Generate kode antrian
         $kodeAntrian = PatientHistory::generateQueueCode($validated['tanggal']);
 
-        // Simpan antrian
-        PatientHistory::create([
-            'user_id' => Auth::id(),
-            'patient_name' => Auth::user()->name,
-            'kode_antrian' => $kodeAntrian,
-            'poli' => $validated['poli'],
-            'dokter' => $validated['dokter'],
-            'tanggal' => $validated['tanggal'],
-            'appointment_time' => $validated['appointment_time'],
-            'keluhan' => $validated['keluhan'],
-            'status' => 'Menunggu',
-            'arrival_status' => 'Belum Hadir',
-        ]);
+        // Get user data
+$user = Auth::user();
+
+// Simpan antrian DENGAN NIK
+PatientHistory::create([
+    'user_id' => $user->id,
+    'patient_name' => $user->name,
+    'patient_nik' => $user->nik,        
+    'patient_email' => $user->email,    
+    'patient_phone' => $user->phone,    
+    'kode_antrian' => $kodeAntrian,
+    'poli' => $validated['poli'],
+    'dokter' => $validated['dokter'],
+    'tanggal' => $validated['tanggal'],
+    'appointment_time' => $validated['appointment_time'],
+    'keluhan' => $validated['keluhan'],
+    'status' => 'Menunggu',
+    'arrival_status' => 'Belum Hadir',
+]);
 
         return redirect()->route('booking.index')
             ->with('success', 'Booking antrian berhasil! Kode antrian Anda: ' . $kodeAntrian);

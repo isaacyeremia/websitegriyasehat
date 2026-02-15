@@ -18,10 +18,10 @@ class ProfileController extends Controller
 
         // Ambil riwayat pasien HANYA milik user ini
         $histories = PatientHistory::where('user_id', $user->id)
-            ->orderBy('visit_date', 'desc')
+            ->orderBy('tanggal', 'desc')
             ->get();
 
-        // Ambil rekam medis HANYA milik user ini - FIXED: gunakan created_at bukan checkup_date
+        // Ambil rekam medis HANYA milik user ini
         $rekam_medis = MedicalRecord::where('patient_id', $user->id)
             ->with('terapis')
             ->orderBy('created_at', 'desc')
@@ -37,15 +37,20 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name'    => 'required|string|max:100',
-            'phone'   => 'required|string|max:20',
-            'email'   => 'required|email',
+            'nik'     => 'nullable|string|size:16|unique:users,nik,' . Auth::id(),
+            'phone'   => 'required|string|max:20|unique:users,phone,' . Auth::id(),
+            'email'   => 'required|email|unique:users,email,' . Auth::id(),
             'address' => 'nullable|string|max:255',
+        ], [
+            'nik.size' => 'NIK harus 16 digit',
+            'nik.unique' => 'NIK sudah terdaftar',
         ]);
 
         $user = Auth::user();
 
         $user->update([
             'name'    => $request->name,
+            'nik'     => $request->nik,
             'phone'   => $request->phone,
             'email'   => $request->email,
             'address' => $request->address,

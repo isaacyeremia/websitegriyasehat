@@ -31,25 +31,29 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th width="150">Nama Lengkap</th>
-                            <td>: <strong>{{ $pasien->name }}</strong></td>
-                        </tr>
-                        <tr>
-                            <th>Email</th>
-                            <td>: {{ $pasien->email }}</td>
-                        </tr>
-                        <tr>
-                            <th>Telepon</th>
-                            <td>: {{ $pasien->phone }}</td>
-                        </tr>
-                        <tr>
-                            <th>Alamat</th>
-                            <td>: {{ $pasien->address ?? '-' }}</td>
-                        </tr>
-                    </table>
-                </div>
+    <table class="table table-borderless">
+        <tr>
+            <th width="150">Nama Lengkap</th>
+            <td>: <strong>{{ $pasien->name }}</strong></td>
+        </tr>
+        <tr>
+            <th>NIK/KTP</th>
+            <td>: {{ $pasien->nik ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>: {{ $pasien->email }}</td>
+        </tr>
+        <tr>
+            <th>Telepon</th>
+            <td>: {{ $pasien->phone }}</td>
+        </tr>
+        <tr>
+            <th>Alamat</th>
+            <td>: {{ $pasien->address ?? '-' }}</td>
+        </tr>
+    </table>
+</div>
                 <div class="col-md-6 text-end">
                     <a href="{{ route('terapis.medical-records.create', $pasien->id) }}" class="btn btn-success btn-lg">
                         <i class="bi bi-plus-circle"></i> Input Rekam Medis Baru

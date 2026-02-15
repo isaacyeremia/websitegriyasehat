@@ -30,7 +30,7 @@
             
             {{-- Search Box --}}
             <div class="mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Cari nama pasien...">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Cari nama, NIK, atau email pasien...">
             </div>
 
             <div class="table-responsive">
@@ -39,6 +39,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Pasien</th>
+                            <th>NIK</th>
                             <th>Email</th>
                             <th>Telepon</th>
                             <th>Total Kunjungan</th>
@@ -52,6 +53,7 @@
                                 <td>
                                     <strong>{{ $pasien->name }}</strong>
                                 </td>
+                                <td>{{ $pasien->nik ?? '-' }}</td>
                                 <td>{{ $pasien->email }}</td>
                                 <td>{{ $pasien->phone }}</td>
                                 <td>
@@ -70,7 +72,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="7" class="text-center text-muted py-4">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p>Belum ada pasien</p>
                                 </td>
@@ -93,16 +95,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <script>
-// Simple search functionality
+// Enhanced search functionality with NIK
 document.getElementById('searchInput').addEventListener('keyup', function() {
     const searchValue = this.value.toLowerCase();
     const tableRows = document.querySelectorAll('#patientTable tbody tr');
     
     tableRows.forEach(row => {
         const name = row.cells[1]?.textContent.toLowerCase() || '';
-        const email = row.cells[2]?.textContent.toLowerCase() || '';
+        const nik = row.cells[2]?.textContent.toLowerCase() || '';
+        const email = row.cells[3]?.textContent.toLowerCase() || '';
         
-        if (name.includes(searchValue) || email.includes(searchValue)) {
+        if (name.includes(searchValue) || nik.includes(searchValue) || email.includes(searchValue)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';

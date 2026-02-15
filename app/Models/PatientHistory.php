@@ -8,18 +8,21 @@ use Carbon\Carbon;
 class PatientHistory extends Model
 {
     protected $fillable = [
-        'user_id',
-        'patient_name',
-        'kode_antrian',
-        'poli',
-        'dokter',
-        'tanggal',
-        'appointment_time',
-        'keluhan',
-        'status',
-        'arrival_status',
-        'confirmed_at',
-    ];
+    'user_id',
+    'patient_name',
+    'patient_nik',  // ✅ Sudah ada
+    'patient_email',
+    'patient_phone',
+    'kode_antrian',
+    'poli',
+    'dokter',
+    'tanggal',
+    'appointment_time',
+    'keluhan',
+    'status',
+    'arrival_status',
+    'confirmed_at',
+];
 
     /**
      * PENTING: Cast untuk timezone yang benar

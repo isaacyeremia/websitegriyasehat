@@ -236,6 +236,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>Kode Antrian</th>
+                            <th>Nama</th>
+                            <th>NIK</th>
                             <th>Layanan</th>
                             <th>Dokter</th>
                             <th>Tanggal</th>
@@ -247,66 +249,68 @@
                     </thead>
                     <tbody>
                         @foreach($userQueues as $queue)
-                            <tr>
-                                <td><strong class="text-primary">{{ $queue->kode_antrian }}</strong></td>
-                                <td>{{ $queue->poli }}</td>
-                                <td>{{ $queue->dokter }}</td>
-                                <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
-                                <td>
-                                    @if($queue->appointment_time)
-                                        <i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($queue->appointment_time)->format('H:i') }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge 
-                                        @if($queue->status == 'Menunggu') bg-warning text-dark
-                                        @elseif($queue->status == 'Dipanggil') bg-info
-                                        @elseif($queue->status == 'Selesai') bg-success
-                                        @else bg-secondary
-                                        @endif
-                                    ">
-                                        {{ $queue->status }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge 
-                                        @if($queue->arrival_status == 'Belum Hadir') bg-secondary
-                                        @elseif($queue->arrival_status == 'Sudah Hadir') bg-success
-                                        @else bg-danger
-                                        @endif
-                                    ">
-                                        {{ $queue->arrival_status }}
-                                    </span>
-                                    @if($queue->confirmed_at)
-                                        <br><small class="text-muted">{{ \Carbon\Carbon::parse($queue->confirmed_at)->format('H:i') }}</small>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    @if($queue->status == 'Menunggu' && $queue->tanggal == now()->toDateString())
-                                        @if($queue->arrival_status == 'Belum Hadir')
-                                            <form method="POST" action="{{ route('booking.confirm-arrival', $queue->id) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-success" title="Konfirmasi Kedatangan">
-                                                    <i class="bi bi-check-circle"></i> Konfirmasi Hadir
-                                                </button>
-                                            </form>
-                                        @else
-                                            <form method="POST" action="{{ route('booking.cancel-arrival', $queue->id) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-warning" title="Batalkan Konfirmasi">
-                                                    <i class="bi bi-x-circle"></i> Batal
-                                                </button>
-                                            </form>
-                                        @endif
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    <tr>
+                        <td><strong class="text-primary">{{ $queue->kode_antrian }}</strong></td>
+                        <td>{{ $queue->patient_name }}</td>
+                        <td>{{ $queue->patient_nik ?? '-' }}</td>
+                        <td>{{ $queue->poli }}</td>
+                        <td>{{ $queue->dokter }}</td>
+                        <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
+                        <td>
+                            @if($queue->appointment_time)
+                                <i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($queue->appointment_time)->format('H:i') }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                               <td>
+                <span class="badge 
+                    @if($queue->status == 'Menunggu') bg-warning text-dark
+                    @elseif($queue->status == 'Dipanggil') bg-info
+                    @elseif($queue->status == 'Selesai') bg-success
+                    @else bg-secondary
+                    @endif
+                ">
+                    {{ $queue->status }}
+                </span>
+            </td>
+            <td>
+                <span class="badge 
+                    @if($queue->arrival_status == 'Belum Hadir') bg-secondary
+                    @elseif($queue->arrival_status == 'Sudah Hadir') bg-success
+                    @else bg-danger
+                    @endif
+                ">
+                    {{ $queue->arrival_status }}
+                </span>
+                @if($queue->confirmed_at)
+                    <br><small class="text-muted">{{ \Carbon\Carbon::parse($queue->confirmed_at)->format('H:i') }}</small>
+                @endif
+            </td>
+            <td class="text-center">
+                @if($queue->status == 'Menunggu' && $queue->tanggal == now()->toDateString())
+                    @if($queue->arrival_status == 'Belum Hadir')
+                        <form method="POST" action="{{ route('booking.confirm-arrival', $queue->id) }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-success" title="Konfirmasi Kedatangan">
+                                <i class="bi bi-check-circle"></i> Konfirmasi Hadir
+                            </button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('booking.cancel-arrival', $queue->id) }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-warning" title="Batalkan Konfirmasi">
+                                <i class="bi bi-x-circle"></i> Batal
+                            </button>
+                        </form>
+                    @endif
+                @else
+                    <span class="text-muted">-</span>
+                @endif
+            </td>
+        </tr>
+    @endforeach
+</tbody>
                 </table>
             </div>
         @else

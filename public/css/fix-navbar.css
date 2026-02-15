@@ -1,0 +1,62 @@
+/* ============================================
+   FIX NAVBAR POSITIONING - NAVBAR HARUS SELALU DI ATAS
+   ============================================ */
+
+/* Pastikan navbar selalu di atas dengan z-index tinggi */
+nav.navbar,
+.navbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Card dan modal tidak boleh menutupi navbar */
+.card,
+.modal,
+.card-auth {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+/* Modal dialog */
+.modal-dialog {
+    z-index: 1050 !important;
+}
+
+/* Dropdown dari navbar harus di atas card */
+.navbar .dropdown-menu {
+    z-index: 10000 !important;
+}
+
+/* Container tidak boleh overlap navbar */
+.container,
+.container-fluid {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Fix untuk halaman dengan card yang besar */
+.center-screen {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Pastikan body punya struktur yang benar */
+body {
+    padding-top: 0 !important;
+    position: relative !important;
+}
+
+/* Header/nav wrapper jika ada */
+header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+}

@@ -353,7 +353,8 @@
                         <tr>
                             <th class="px-3">No</th>
                             <th>Kode</th>
-                            <th>Pasien</th>
+                            <th>Nama Pasien</th>
+                            <th>NIK</th>
                             <th>Poli</th>
                             <th>Dokter</th>
                             <th>Tanggal</th>
@@ -370,6 +371,7 @@
                                 <td class="px-3">{{ $antrians->firstItem() + $index }}</td>
                                 <td><strong class="text-primary">{{ $antrian->kode_antrian }}</strong></td>
                                 <td>{{ $antrian->patient_name }}</td>
+                                <td>{{ $antrian->patient_nik ?? '-' }}</td>
                                 <td>{{ $antrian->poli }}</td>
                                 <td>{{ $antrian->dokter }}</td>
                                 <td>{{ \Carbon\Carbon::parse($antrian->tanggal)->format('d M Y') }}</td>
@@ -448,6 +450,7 @@
                                                         <div class="mb-3">
                                                             <p class="mb-2"><strong>Kode Antrian:</strong> <span class="text-primary">{{ $antrian->kode_antrian }}</span></p>
                                                             <p class="mb-2"><strong>Nama Pasien:</strong> {{ $antrian->patient_name }}</p>
+                                                            <p class="mb-2"><strong>NIK:</strong> {{ $antrian->patient_nik ?? 'Tidak ada' }}</p>
                                                             <p class="mb-2"><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($antrian->tanggal)->format('d M Y') }}</p>
                                                             @if($antrian->appointment_time)
                                                                 <p class="mb-0"><strong>Jam:</strong> {{ \Carbon\Carbon::parse($antrian->appointment_time)->format('H:i') }}</p>
@@ -512,7 +515,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="text-center text-muted py-5">
+                                <td colspan="12" class="text-center text-muted py-5">
                                     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                     <p>Belum ada antrian</p>
                                 </td>
