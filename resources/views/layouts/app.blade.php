@@ -84,7 +84,7 @@
   {{-- NAVBAR --}}
   <nav class="navbar">
     <div class="container">
-      <a class="brand-logo d-flex align-items-center gap-2" href="{{ url('/home') }}">
+      <a class="brand-logo d-flex align-items-center gap-2" href="{{ url('/') }}">
         <img src="{{ asset('logo.png') }}" alt="logo" style="height:44px;">
         <span>Griya Sehat UKDC</span>
       </a>
@@ -92,7 +92,7 @@
       {{-- MENU TENGAH --}}
       @if (!request()->is('login') && !request()->is('register'))
       <div class="nav-menu">
-        <a href="{{ url('/home') }}">Beranda</a>
+        <a href="{{ url('/') }}">Beranda</a>
         <a href="{{ route('profile') }}">Profile</a>
         <a href="{{ route('apotek.index') }}">Katalog</a>
         
