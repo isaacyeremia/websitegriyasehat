@@ -43,6 +43,172 @@
   </div>
 </section>
 
+<!-- LAYANAN KAMI (CAROUSEL SLIDER) -->
+<section class="section bg-light">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-1">Layanan Kami</h2>
+    <p class="text-center text-muted mb-5">Berbagai Metode Pengobatan Tradisional & Modern</p>
+
+    <div id="layananCarousel" class="carousel slide" data-bs-ride="carousel">
+      
+      <!-- Indicators -->
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="3"></button>
+        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="4"></button>
+      </div>
+
+      <!-- Slides -->
+      <div class="carousel-inner">
+        
+        <!-- Slide 1: Akupuntur -->
+        <div class="carousel-item active">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+              <div class="card border-0 shadow-lg">
+                <img src="{{ asset('images/layanan/akupuntur.jpg') }}" 
+                     class="card-img-top" 
+                     alt="Akupuntur"
+                     style="height: 400px; object-fit: cover;">
+                <div class="card-body text-center p-4">
+                  <h4 class="fw-bold mb-3">Akupuntur</h4>
+                  <p class="text-muted">
+                    Terapi tusuk jarum tradisional Tiongkok untuk menyeimbangkan energi tubuh, 
+                    mengatasi nyeri, stres, dan berbagai keluhan kesehatan lainnya.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-primary">Nyeri Sendi</span>
+                    <span class="badge bg-primary">Migrain</span>
+                    <span class="badge bg-primary">Stres</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Pengobatan Herbal -->
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+              <div class="card border-0 shadow-lg">
+                <img src="{{ asset('images/layanan/pengobatan_herbal.jpg') }}" 
+                     class="card-img-top" 
+                     alt="Pengobatan Herbal"
+                     style="height: 400px; object-fit: cover;">
+                <div class="card-body text-center p-4">
+                  <h4 class="fw-bold mb-3">Pengobatan Herbal</h4>
+                  <p class="text-muted">
+                    Ramuan herbal tradisional dari bahan-bahan alami pilihan untuk 
+                    meningkatkan daya tahan tubuh dan mengatasi berbagai penyakit secara alami.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-success">Alami</span>
+                    <span class="badge bg-success">Aman</span>
+                    <span class="badge bg-success">Berkhasiat</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Bekam/Kop -->
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+              <div class="card border-0 shadow-lg">
+                <img src="{{ asset('images/layanan/bekam.jpg') }}" 
+                     class="card-img-top" 
+                     alt="Bekam"
+                     style="height: 400px; object-fit: cover;">
+                <div class="card-body text-center p-4">
+                  <h4 class="fw-bold mb-3">Bekam / Kop</h4>
+                  <p class="text-muted">
+                    Terapi bekam basah dan kering untuk mengeluarkan racun, melancarkan peredaran darah, 
+                    dan meningkatkan sistem kekebalan tubuh.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-danger">Detoksifikasi</span>
+                    <span class="badge bg-danger">Sirkulasi Darah</span>
+                    <span class="badge bg-danger">Imunitas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Kerokan -->
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+              <div class="card border-0 shadow-lg">
+                <img src="{{ asset('images/layanan/kerokan.jpg') }}" 
+                     class="card-img-top" 
+                     alt="Kerokan"
+                     style="height: 400px; object-fit: cover;">
+                <div class="card-body text-center p-4">
+                  <h4 class="fw-bold mb-3">Kerokan / Gua Sha</h4>
+                  <p class="text-muted">
+                    Teknik kerokan tradisional dengan alat khusus untuk mengeluarkan angin, 
+                    mengurangi demam, masuk angin, dan melancarkan peredaran darah.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-warning text-dark">Masuk Angin</span>
+                    <span class="badge bg-warning text-dark">Pegal Linu</span>
+                    <span class="badge bg-warning text-dark">Demam</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5: Pijat Tuina -->
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+              <div class="card border-0 shadow-lg">
+                <img src="{{ asset('images/layanan/pijat_tuina.jpg') }}" 
+                     class="card-img-top" 
+                     alt="Pijat Tuina"
+                     style="height: 400px; object-fit: cover;">
+                <div class="card-body text-center p-4">
+                  <h4 class="fw-bold mb-3">Pijat Tuina</h4>
+                  <p class="text-muted">
+                    Pijat terapi tradisional Tiongkok dengan teknik khusus untuk relaksasi otot, 
+                    mengatasi nyeri, dan meningkatkan kesehatan secara menyeluruh.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-info">Relaksasi</span>
+                    <span class="badge bg-info">Nyeri Otot</span>
+                    <span class="badge bg-info">Kesehatan</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#layananCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#layananCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+
+  </div>
+</section>
+
 <!-- TENAGA MEDIS -->
 <section class="section">
   <div class="container">
@@ -154,5 +320,47 @@
     </div>
   </div>
 </section>
+
+<!-- Custom CSS untuk Carousel -->
+<style>
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 20px;
+  }
+
+  .carousel-indicators button {
+    background-color: #6c757d;
+  }
+
+  .carousel-indicators button.active {
+    background-color: #0d6efd;
+  }
+
+  .carousel-item {
+    padding: 20px 0;
+    min-height: 600px;
+  }
+
+  .bg-light {
+    background-color: #f8f9fa !important;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-item {
+      min-height: 550px;
+    }
+    
+    .card-img-top {
+      height: 300px !important;
+    }
+  }
+</style>
 
 @endsection
