@@ -252,11 +252,18 @@
           <a href="{{ route('profile') }}">Profile</a>
           <a href="{{ route('apotek.index') }}">Katalog</a>
           
-          {{-- Admin Dashboard Link --}}
+          {{-- Link Dashboard Admin (hanya muncul jika user adalah admin) --}}
           @auth
             @if(Auth::user()->isAdmin())
               <a href="{{ route('admin.dashboard') }}" class="text-danger fw-bold">
                 <i class="bi bi-speedometer2"></i> Dashboard Admin
+              </a>
+            @endif
+
+            {{-- Link Dashboard Terapis (hanya muncul jika user adalah terapis) --}}
+            @if(Auth::user()->isTerapis())
+              <a href="{{ route('terapis.dashboard') }}" class="text-primary fw-bold">
+                <i class="bi bi-clipboard-heart"></i> Dashboard Terapis
               </a>
             @endif
           @endauth
@@ -270,6 +277,8 @@
               Halo, <strong>{{ Auth::user()->name }}</strong>
               @if(Auth::user()->isAdmin())
                 <span class="badge bg-danger ms-1">Admin</span>
+              @elseif(Auth::user()->isTerapis())
+                <span class="badge bg-primary ms-1">Terapis</span>
               @endif
             </span>
             <form method="POST" action="{{ route('logout') }}">
