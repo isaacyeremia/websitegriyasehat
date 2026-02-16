@@ -434,83 +434,6 @@
                                             </button>
                                         </form>
                                     </div>
-
-                                    {{-- Modal Update Status --}}
-                                    <div class="modal fade" id="updateModal{{ $antrian->id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header bg-primary text-white">
-                                                    <h5 class="modal-title">Update Status Antrian</h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <form method="POST" action="{{ route('admin.antrian.update', $antrian->id) }}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <p class="mb-2"><strong>Kode Antrian:</strong> <span class="text-primary">{{ $antrian->kode_antrian }}</span></p>
-                                                            <p class="mb-2"><strong>Nama Pasien:</strong> {{ $antrian->patient_name }}</p>
-                                                            <p class="mb-2"><strong>NIK:</strong> {{ $antrian->patient_nik ?? 'Tidak ada' }}</p>
-                                                            <p class="mb-2"><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($antrian->tanggal)->format('d M Y') }}</p>
-                                                            @if($antrian->appointment_time)
-                                                                <p class="mb-0"><strong>Jam:</strong> {{ \Carbon\Carbon::parse($antrian->appointment_time)->format('H:i') }}</p>
-                                                            @endif
-                                                        </div>
-                                                        
-                                                        <hr>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold">
-                                                                <i class="bi bi-person-check"></i> Status Kedatangan
-                                                            </label>
-                                                            <select name="arrival_status" class="form-select" required>
-                                                                <option value="Belum Hadir" {{ $antrian->arrival_status == 'Belum Hadir' ? 'selected' : '' }}>🔴 Belum Hadir</option>
-                                                                <option value="Sudah Hadir" {{ $antrian->arrival_status == 'Sudah Hadir' ? 'selected' : '' }}>✅ Sudah Hadir</option>
-                                                                <option value="Tidak Hadir" {{ $antrian->arrival_status == 'Tidak Hadir' ? 'selected' : '' }}>❌ Tidak Hadir</option>
-                                                            </select>
-                                                            <small class="text-muted">Ubah status ini saat pasien check-in di front desk</small>
-                                                            
-                                                            @if($antrian->confirmed_at)
-                                                                <div class="alert alert-info mt-2 mb-0">
-                                                                    <small>
-                                                                        <i class="bi bi-info-circle"></i> 
-                                                                        Dikonfirmasi pada: {{ \Carbon\Carbon::parse($antrian->confirmed_at)->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB
-                                                                    </small>
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold">
-                                                                <i class="bi bi-list-check"></i> Status Antrian
-                                                            </label>
-                                                            <select name="status" class="form-select" required>
-                                                                <option value="Menunggu" {{ $antrian->status == 'Menunggu' ? 'selected' : '' }}>⏳ Menunggu</option>
-                                                                <option value="Dipanggil" {{ $antrian->status == 'Dipanggil' ? 'selected' : '' }}>📢 Dipanggil</option>
-                                                                <option value="Selesai" {{ $antrian->status == 'Selesai' ? 'selected' : '' }}>✅ Selesai</option>
-                                                                <option value="Dibatalkan" {{ $antrian->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="alert alert-warning mb-0">
-                                                            <small>
-                                                                <i class="bi bi-lightbulb"></i> <strong>Tips:</strong><br>
-                                                                • Ubah ke "Sudah Hadir" saat pasien check-in<br>
-                                                                • Ubah ke "Tidak Hadir" jika pasien tidak datang<br>
-                                                                • Status antrian "Dipanggil" untuk memanggil pasien
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-primary">
-                                                            <i class="bi bi-save"></i> Simpan Perubahan
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -534,6 +457,104 @@
     </div>
 </div>
 
+{{-- ========== MODALS - PINDAHKAN KE SINI (KELUAR DARI TABLE) ========== --}}
+@foreach($antrians as $antrian)
+<div class="modal fade" id="updateModal{{ $antrian->id }}" tabindex="-1" aria-labelledby="updateModalLabel{{ $antrian->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="updateModalLabel{{ $antrian->id }}">Update Status Antrian</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('admin.antrian.update', $antrian->id) }}">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    {{-- Info Pasien --}}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <strong>Kode Antrian:</strong> 
+                                <span class="text-primary">{{ $antrian->kode_antrian }}</span>
+                            </div>
+                            <div class="col-12">
+                                <strong>Nama Pasien:</strong> 
+                                {{ $antrian->patient_name }}
+                            </div>
+                            <div class="col-12">
+                                <strong>NIK:</strong> 
+                                {{ $antrian->patient_nik ?? 'Tidak ada' }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Tanggal:</strong> 
+                                {{ \Carbon\Carbon::parse($antrian->tanggal)->format('d M Y') }}
+                            </div>
+                            @if($antrian->appointment_time)
+                            <div class="col-6">
+                                <strong>Jam:</strong> 
+                                {{ \Carbon\Carbon::parse($antrian->appointment_time)->format('H:i') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    {{-- Status Kedatangan --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-person-check"></i> Status Kedatangan
+                        </label>
+                        <select name="arrival_status" class="form-select" required>
+                            <option value="Belum Hadir" {{ $antrian->arrival_status == 'Belum Hadir' ? 'selected' : '' }}>🔴 Belum Hadir</option>
+                            <option value="Sudah Hadir" {{ $antrian->arrival_status == 'Sudah Hadir' ? 'selected' : '' }}>✅ Sudah Hadir</option>
+                            <option value="Tidak Hadir" {{ $antrian->arrival_status == 'Tidak Hadir' ? 'selected' : '' }}>❌ Tidak Hadir</option>
+                        </select>
+                        <small class="text-muted d-block mt-1">Ubah status saat pasien check-in</small>
+                        
+                        @if($antrian->confirmed_at)
+                            <div class="alert alert-info mt-2 mb-0 py-2">
+                                <small>
+                                    <i class="bi bi-info-circle"></i> 
+                                    Dikonfirmasi: {{ \Carbon\Carbon::parse($antrian->confirmed_at)->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB
+                                </small>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    {{-- Status Antrian --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-list-check"></i> Status Antrian
+                        </label>
+                        <select name="status" class="form-select" required>
+                            <option value="Menunggu" {{ $antrian->status == 'Menunggu' ? 'selected' : '' }}>⏳ Menunggu</option>
+                            <option value="Dipanggil" {{ $antrian->status == 'Dipanggil' ? 'selected' : '' }}>📢 Dipanggil</option>
+                            <option value="Selesai" {{ $antrian->status == 'Selesai' ? 'selected' : '' }}>✅ Selesai</option>
+                            <option value="Dibatalkan" {{ $antrian->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
+                        </select>
+                    </div>
+
+                    {{-- Tips --}}
+                    <div class="alert alert-warning mb-0 py-2">
+                        <small>
+                            <i class="bi bi-lightbulb"></i> <strong>Tips:</strong><br>
+                            • "Sudah Hadir" saat pasien check-in<br>
+                            • "Tidak Hadir" jika pasien tidak datang<br>
+                            • "Dipanggil" untuk memanggil pasien
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
 <script>
 function scrollToAntrian() {
     const element = document.getElementById('daftarAntrian');
@@ -541,5 +562,40 @@ function scrollToAntrian() {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
+
+// Modal fix - remove backdrop and use modal background
+document.addEventListener('show.bs.modal', function(event) {
+    const modal = event.target;
+
+    // Remove any existing backdrop
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+    // Set modal background
+    setTimeout(() => {
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.65)';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+
+        // Force all elements clickable
+        modal.querySelectorAll('*').forEach(el => {
+            el.style.pointerEvents = 'auto';
+        });
+    }, 10);
+});
+
+// Clean up when modal closes
+document.addEventListener('hidden.bs.modal', function(event) {
+    const modal = event.target;
+    modal.style.backgroundColor = '';
+
+    // Clean up any leftover backdrops
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+    // Reset body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+});
 </script>
 @endsection

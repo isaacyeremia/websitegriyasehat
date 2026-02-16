@@ -24,7 +24,7 @@
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
-        z-index: 9999 !important;
+        z-index: 1030 !important;
         background-color: white !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
         padding: 0.75rem 0 !important;
@@ -215,13 +215,142 @@
         margin-top: 100px !important;
     }
 
-    .modal-backdrop {
-        z-index: 1040 !important;
+    /* ========================================================================
+   ⭐ MODAL & BACKDROP - FIX FOR HIGH DPI/SCALING LAPTOPS ⭐
+   ======================================================================== */
+
+/* Hide backdrop completely - use modal background instead */
+.modal-backdrop {
+    display: none !important;
+}
+
+/* Modal dengan background sendiri */
+.modal {
+    z-index: 1055 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.modal.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+    position: relative !important;
+    z-index: 1060 !important;
+    margin: 1.75rem auto !important;
+    max-width: 500px !important;
+}
+
+/* Modal Dialog Centered */
+.modal-dialog-centered {
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100% - 3.5rem) !important;
+}
+
+/* Modal Dialog Scrollable */
+.modal-dialog-scrollable {
+    height: auto !important;
+    max-height: calc(100vh - 3.5rem) !important;
+}
+
+.modal-dialog-scrollable .modal-content {
+    max-height: 100% !important;
+    overflow: hidden !important;
+}
+
+.modal-dialog-scrollable .modal-body {
+    overflow-y: auto !important;
+    max-height: calc(100vh - 250px) !important;
+}
+
+/* Modal Content */
+.modal-content {
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    position: relative !important;
+    z-index: 1061 !important;
+    pointer-events: auto !important;
+}
+
+/* Modal Header */
+.modal-header {
+    border-radius: 12px 12px 0 0 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Modal Body */
+.modal-body {
+    position: relative !important;
+}
+
+/* Modal Footer */
+.modal-footer {
+    flex-shrink: 0 !important;
+}
+
+/* Body saat modal terbuka */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* Force ALL modal elements clickable */
+.modal *,
+.modal input,
+.modal select,
+.modal textarea,
+.modal button,
+.modal .btn,
+.modal .btn-close,
+.modal .form-control,
+.modal .form-select,
+.modal label,
+.modal .alert {
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+.modal input,
+.modal select,
+.modal button,
+.modal .btn {
+    cursor: pointer !important;
+}
+
+.modal input[type="text"],
+.modal input[type="date"],
+.modal input[type="number"],
+.modal input[type="email"],
+.modal input[type="password"],
+.modal textarea {
+    cursor: text !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .modal-dialog {
+        max-width: calc(100% - 1rem) !important;
+        margin: 0.5rem !important;
     }
     
-    .modal-dialog {
-        z-index: 1050 !important;
+    .modal-dialog-centered {
+        min-height: calc(100% - 1rem) !important;
     }
+    
+    .modal-dialog-scrollable {
+        max-height: calc(100vh - 1rem) !important;
+    }
+    
+    .modal-dialog-scrollable .modal-body {
+        max-height: calc(100vh - 180px) !important;
+    }
+}
   </style>
 </head>
 
@@ -314,14 +443,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Force navbar position
-      const navbar = document.querySelector('.navbar');
-      if (navbar) {
-        navbar.style.position = 'fixed';
-        navbar.style.top = '0';
-        navbar.style.zIndex = '9999';
-      }
-
       // Auto-close menu on link click (mobile)
       const navLinks = document.querySelectorAll('.navbar-nav-center a');
       const navbarCollapse = document.getElementById('navbarMenu');
@@ -338,6 +459,14 @@
           });
         });
       }
+
+      // Clean up modal backdrop saat ditutup
+      document.addEventListener('hidden.bs.modal', function() {
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+      });
     });
   </script>
 
