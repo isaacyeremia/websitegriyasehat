@@ -5,20 +5,26 @@
 @section('content')
 <div class="container-fluid py-4">
     
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0">📋 Detail Pasien</h2>
             <p class="text-muted">Riwayat kunjungan dan rekam medis</p>
         </div>
-                <a href="{{ route('terapis.patients.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Kembali
-            </a>
-        </div>
+        <a href="{{ route('terapis.patients.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             <i class="bi bi-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -31,29 +37,29 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-    <table class="table table-borderless">
-        <tr>
-            <th width="150">Nama Lengkap</th>
-            <td>: <strong>{{ $pasien->name }}</strong></td>
-        </tr>
-        <tr>
-            <th>NIK/KTP</th>
-            <td>: {{ $pasien->nik ?? '-' }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>: {{ $pasien->email }}</td>
-        </tr>
-        <tr>
-            <th>Telepon</th>
-            <td>: {{ $pasien->phone }}</td>
-        </tr>
-        <tr>
-            <th>Alamat</th>
-            <td>: {{ $pasien->address ?? '-' }}</td>
-        </tr>
-    </table>
-</div>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Nama Lengkap</th>
+                            <td>: <strong>{{ $pasien->name }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>NIK/KTP</th>
+                            <td>: {{ $pasien->nik ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>: {{ $pasien->email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telepon</th>
+                            <td>: {{ $pasien->phone }}</td>
+                        </tr>
+                        <tr>
+                            <th>Alamat</th>
+                            <td>: {{ $pasien->address ?? '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="col-md-6 text-end">
                     <a href="{{ route('terapis.medical-records.create', $pasien->id) }}" class="btn btn-success btn-lg">
                         <i class="bi bi-plus-circle"></i> Input Rekam Medis Baru
@@ -114,10 +120,20 @@
                                 <small class="text-muted">oleh {{ $record->terapis->name }}</small>
                             </div>
                             <p class="mb-1"><strong>Keluhan:</strong> {{ Str::limit($record->complaint, 80) }}</p>
-                            <p class="mb-1"><strong>Diagnosis:</strong> {{ $record->diagnosis }}</p>
-                            <a href="{{ route('terapis.medical-records.show', $record->id) }}" class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-eye"></i> Lihat Detail
-                            </a>
+                            <p class="mb-2"><strong>Diagnosis:</strong> {{ $record->diagnosis }}</p>
+                            
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('terapis.medical-records.show', $record->id) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-eye"></i> Lihat Detail
+                                </a>
+                                
+                                {{-- Tombol Edit hanya muncul jika terapis yang login adalah pembuat rekam medis --}}
+                                @if(auth()->id() == $record->terapis_id || auth()->user()->isAdmin())
+                                    <a href="{{ route('terapis.medical-records.edit', $record->id) }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     @empty
                         <p class="text-muted text-center">Belum ada rekam medis</p>

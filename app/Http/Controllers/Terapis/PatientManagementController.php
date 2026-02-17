@@ -137,23 +137,95 @@ class PatientManagementController extends Controller
     }
 
     public function updatePatient(Request $request, $id)
-{
-    $pasien = User::where('role', 'user')->findOrFail($id);
+    {
+        $pasien = User::where('role', 'user')->findOrFail($id);
 
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'nik' => 'nullable|string|size:16|unique:users,nik,' . $id,
-        'phone' => 'required|string|unique:users,phone,' . $id,
-        'email' => 'required|email|unique:users,email,' . $id,
-        'address' => 'nullable|string',
-    ], [
-        'nik.size' => 'NIK harus 16 digit',
-        'nik.unique' => 'NIK sudah terdaftar',
-    ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'nik' => 'nullable|string|size:16|unique:users,nik,' . $id,
+            'phone' => 'required|string|unique:users,phone,' . $id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'address' => 'nullable|string',
+        ], [
+            'nik.size' => 'NIK harus 16 digit',
+            'nik.unique' => 'NIK sudah terdaftar',
+        ]);
 
-    $pasien->update($validated);
+        $pasien->update($validated);
 
-    return redirect()->route('terapis.patients.show', $id)
-                    ->with('success', 'Data pasien berhasil diupdate');
-}
+        return redirect()->route('terapis.patients.show', $id)
+                        ->with('success', 'Data pasien berhasil diupdate');
+    }
+
+    public function editMedicalRecord($recordId)
+    {
+        $record = MedicalRecord::with(['patient', 'terapis'])->findOrFail($recordId);
+        
+        // Cek apakah terapis yang login adalah yang membuat rekam medis ini
+        if (auth()->id() != $record->terapis_id && !auth()->user()->isAdmin()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengedit rekam medis ini');
+        }
+        
+        $pasien = $record->patient;
+        
+        $riwayat_kunjungan = PatientHistory::where('user_id', $pasien->id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+        return view('terapis.medical-records.edit', compact('record', 'pasien', 'riwayat_kunjungan'));
+    }
+
+    public function updateMedicalRecord(Request $request, $recordId)
+    {
+        $record = MedicalRecord::findOrFail($recordId);
+        
+        // Cek apakah terapis yang login adalah yang membuat rekam medis ini
+        if (auth()->id() != $record->terapis_id && !auth()->user()->isAdmin()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengedit rekam medis ini');
+        }
+        
+        $validated = $request->validate([
+            'queue_id' => 'nullable|exists:patient_histories,id',
+            'complaint' => 'required|string',
+            'anamnesis' => 'nullable|string',
+            'riwayat_penyakit' => 'nullable|string',
+            'diagnosis' => 'required|string',
+            'diagnosis_awal' => 'nullable|string',
+            'diagnosis_akhir' => 'nullable|string',
+            'treatment' => 'nullable|string',
+            'pengobatan' => 'nullable|string',
+            'medicine' => 'nullable|string',
+            'obat_diberikan' => 'nullable|string',
+            'doctor_note' => 'nullable|string',
+            'catatan_tambahan' => 'nullable|string',
+            'checkup_date' => 'required|date',
+        ]);
+
+        // Data yang akan diupdate
+        $data = [
+            'complaint' => $validated['complaint'],
+            'anamnesis' => $validated['anamnesis'],
+            'riwayat_penyakit' => $validated['riwayat_penyakit'],
+            'diagnosis' => $validated['diagnosis'],
+            'diagnosis_awal' => $validated['diagnosis_awal'],
+            'diagnosis_akhir' => $validated['diagnosis_akhir'],
+            'treatment' => $validated['treatment'],
+            'pengobatan' => $validated['pengobatan'],
+            'medicine' => $validated['medicine'],
+            'obat_diberikan' => $validated['obat_diberikan'],
+            'doctor_note' => $validated['doctor_note'],
+            'catatan_tambahan' => $validated['catatan_tambahan'],
+            'checkup_date' => $validated['checkup_date'],
+        ];
+
+        // Hanya update queue_id jika kolom ada di database
+        if (Schema::hasColumn('medical_records', 'queue_id')) {
+            $data['queue_id'] = $validated['queue_id'];
+        }
+
+        $record->update($data);
+
+        return redirect()->route('terapis.patients.show', $record->patient_id)
+                        ->with('success', 'Rekam medis berhasil diupdate');
+    }
 }

@@ -152,4 +152,8 @@ Route::middleware(['auth', 'terapis'])->prefix('terapis')->name('terapis.')->gro
     Route::get('/medical-records/create/{patientId}', [PatientManagementController::class, 'createMedicalRecord'])->name('medical-records.create');
     Route::post('/medical-records/store/{patientId}', [PatientManagementController::class, 'storeMedicalRecord'])->name('medical-records.store');
     Route::get('/medical-records/{recordId}', [PatientManagementController::class, 'showMedicalRecord'])->name('medical-records.show');
+    
+    // EDIT & UPDATE MEDICAL RECORDS - NEW ROUTES
+    Route::get('/medical-records/{recordId}/edit', [PatientManagementController::class, 'editMedicalRecord'])->name('medical-records.edit');
+    Route::put('/medical-records/{recordId}', [PatientManagementController::class, 'updateMedicalRecord'])->name('medical-records.update');
 });

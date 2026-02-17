@@ -10,6 +10,13 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold mb-0">📄 Detail Rekam Medis</h2>
                 <div>
+                    {{-- Tombol Edit hanya muncul jika terapis yang login adalah pembuat rekam medis --}}
+                    @if(auth()->id() == $record->terapis_id || auth()->user()->isAdmin())
+                        <a href="{{ route('terapis.medical-records.edit', $record->id) }}" class="btn btn-warning me-2">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+                    @endif
+                    
                     <button onclick="window.print()" class="btn btn-secondary me-2">
                         <i class="bi bi-printer"></i> Print
                     </button>
