@@ -5,167 +5,240 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PharmacyProduct;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PharmacyProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ================================
+    // KONFIGURASI GAMBAR
+    // ================================
+    const IMAGE_MAX_WIDTH  = 800;
+    const IMAGE_MAX_HEIGHT = 800;
+    const IMAGE_QUALITY    = 85;
+    const IMAGE_DIR        = 'images/pharmacy-products';
+
+    // Kategori tersedia (satu sumber kebenaran, dipakai controller & view)
+    const CATEGORIES = [
+        'minyak'   => 'Minyak Gosok',
+        'herbal'   => 'Obat Herbal',
+        'suplemen' => 'Suplemen',
+        'sirup'    => 'Sirup',
+    ];
+
     public function index(Request $request)
     {
         $query = PharmacyProduct::query();
 
-        // Filter pencarian
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Filter status
         if ($request->filled('status')) {
-            if ($request->status == 'active') {
-                $query->where('is_active', true);
-            } elseif ($request->status == 'inactive') {
-                $query->where('is_active', false);
-            }
+            $query->where('is_active', $request->status === 'active');
         }
 
-        // Sorting
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
         $sort = $request->get('sort', 'newest');
-        switch ($sort) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            default:
-                $query->orderBy('created_at', 'desc');
-        }
+        match ($sort) {
+            'oldest'     => $query->orderBy('created_at', 'asc'),
+            'name_asc'   => $query->orderBy('name', 'asc'),
+            'name_desc'  => $query->orderBy('name', 'desc'),
+            'price_low'  => $query->orderBy('price', 'asc'),
+            'price_high' => $query->orderBy('price', 'desc'),
+            default      => $query->orderBy('created_at', 'desc'),
+        };
 
-        $products = $query->paginate(15)->withQueryString();
+        $products   = $query->paginate(15)->withQueryString();
+        $categories = self::CATEGORIES;
 
-        return view('admin.pharmacy.index', compact('products'));
+        return view('admin.pharmacy.index', compact('products', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('admin.pharmacy.create');
+        $categories = self::CATEGORIES;
+        return view('admin.pharmacy.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'           => 'required|string|max:255',
+            'price'          => 'required|numeric|min:0',
+            'image'          => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'category'       => 'required|in:' . implode(',', array_keys(self::CATEGORIES)),
+            'description'    => 'nullable|string|max:1000',
             'tokopedia_link' => 'nullable|url',
-            'is_active' => 'nullable|boolean',
+            'is_active'      => 'nullable|boolean',
         ]);
 
-        // Upload gambar
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('pharmacy-products', 'public');
-            $validated['image'] = $imagePath;
+            $validated['image'] = $this->processAndSaveImage($request->file('image'));
         }
 
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->has('is_active');
 
         PharmacyProduct::create($validated);
 
         return redirect()->route('admin.pharmacy.index')
-                        ->with('success', 'Produk berhasil ditambahkan!');
+                         ->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
-        $product = PharmacyProduct::findOrFail($id);
-        return view('admin.pharmacy.edit', compact('product'));
+        $product    = PharmacyProduct::findOrFail($id);
+        $categories = self::CATEGORIES;
+        return view('admin.pharmacy.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $product = PharmacyProduct::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'           => 'required|string|max:255',
+            'price'          => 'required|numeric|min:0',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'category'       => 'required|in:' . implode(',', array_keys(self::CATEGORIES)),
+            'description'    => 'nullable|string|max:1000',
             'tokopedia_link' => 'nullable|url',
-            'is_active' => 'nullable|boolean',
+            'is_active'      => 'nullable|boolean',
         ]);
 
-        // Upload gambar baru jika ada
         if ($request->hasFile('image')) {
-            // Hapus gambar lama
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $imagePath = $request->file('image')->store('pharmacy-products', 'public');
-            $validated['image'] = $imagePath;
+            $this->deleteImage($product->image);
+            $validated['image'] = $this->processAndSaveImage($request->file('image'));
         }
 
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->has('is_active');
 
         $product->update($validated);
 
         return redirect()->route('admin.pharmacy.index')
-                        ->with('success', 'Produk berhasil diupdate!');
+                         ->with('success', 'Produk berhasil diupdate!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $product = PharmacyProduct::findOrFail($id);
-
-        // Hapus gambar
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-
+        $this->deleteImage($product->image);
         $product->delete();
 
         return redirect()->route('admin.pharmacy.index')
-                        ->with('success', 'Produk berhasil dihapus!');
+                         ->with('success', 'Produk berhasil dihapus!');
     }
 
-    /**
-     * Toggle product status (active/inactive)
-     */
     public function toggleStatus($id)
     {
-        $product = PharmacyProduct::findOrFail($id);
+        $product            = PharmacyProduct::findOrFail($id);
         $product->is_active = !$product->is_active;
         $product->save();
 
         $status = $product->is_active ? 'diaktifkan' : 'dinonaktifkan';
-        
+
         return redirect()->route('admin.pharmacy.index')
-                        ->with('success', "Produk {$product->name} berhasil {$status}!");
+                         ->with('success', "Produk {$product->name} berhasil {$status}!");
+    }
+
+    // ================================================================
+    // PRIVATE HELPERS
+    // ================================================================
+
+    private function processAndSaveImage($file): string
+    {
+        $dir = public_path(self::IMAGE_DIR);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $mime     = $file->getMimeType();
+        $realPath = $file->getRealPath();
+
+        // Cek fitur GD yang tersedia di instalasi PHP ini
+        $gdInfo      = function_exists('gd_info') ? \gd_info() : [];
+        $webpRead    = function_exists('imagecreatefromwebp') && !empty($gdInfo['WebP Support']);
+        $webpWrite   = function_exists('imagewebp') && !empty($gdInfo['WebP Support']);
+        $fromString  = function_exists('imagecreatefromstring');
+
+        // Load source image sesuai mime type dan kemampuan GD
+        $src = null;
+
+        if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
+            $src = \imagecreatefromjpeg($realPath);
+        } elseif ($mime === 'image/png' && function_exists('imagecreatefrompng')) {
+            $src = $this->pngToTruecolor($realPath);
+        } elseif ($mime === 'image/gif' && function_exists('imagecreatefromgif')) {
+            $src = \imagecreatefromgif($realPath);
+        } elseif ($mime === 'image/webp' && $webpRead) {
+            $src = \imagecreatefromwebp($realPath);
+        } elseif ($fromString) {
+            // Fallback universal: baca raw bytes (support jpeg/png/gif/bmp)
+            $src = \imagecreatefromstring(\file_get_contents($realPath));
+        }
+
+        // Jika GD sama sekali tidak bisa baca file ini, simpan apa adanya
+        if (!$src) {
+            $ext      = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
+            $filename = \uniqid('prod_') . '.' . $ext;
+            $file->move($dir, $filename);
+            return $filename;
+        }
+
+        $origW = \imagesx($src);
+        $origH = \imagesy($src);
+
+        [$newW, $newH] = $this->calcResizeDimensions($origW, $origH, self::IMAGE_MAX_WIDTH, self::IMAGE_MAX_HEIGHT);
+
+        $dst = \imagecreatetruecolor($newW, $newH);
+        \imagealphablending($dst, false);
+        \imagesavealpha($dst, true);
+        \imagefill($dst, 0, 0, \imagecolorallocatealpha($dst, 0, 0, 0, 127));
+        \imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+
+        // Simpan: WebP jika didukung, JPG sebagai fallback
+        if ($webpWrite) {
+            $filename = \uniqid('prod_') . '.webp';
+            \imagewebp($dst, $dir . DIRECTORY_SEPARATOR . $filename, self::IMAGE_QUALITY);
+        } else {
+            $filename = \uniqid('prod_') . '.jpg';
+            \imagejpeg($dst, $dir . DIRECTORY_SEPARATOR . $filename, self::IMAGE_QUALITY);
+        }
+
+        \imagedestroy($src);
+        \imagedestroy($dst);
+
+        return $filename;
+    }
+
+    private function calcResizeDimensions(int $origW, int $origH, int $maxW, int $maxH): array
+    {
+        if ($origW <= $maxW && $origH <= $maxH) {
+            return [$origW, $origH];
+        }
+        $ratio = min($maxW / $origW, $maxH / $origH);
+        return [(int) round($origW * $ratio), (int) round($origH * $ratio)];
+    }
+
+    private function pngToTruecolor(string $path)
+    {
+        $img = \imagecreatefrompng($path);
+        \imagealphablending($img, false);
+        \imagesavealpha($img, true);
+        return $img;
+    }
+
+    private function deleteImage(?string $image): void
+    {
+        if (!$image) return;
+        // Hanya hapus file baru (nama file saja, tanpa slash = upload via admin)
+        // File lama dari seeder (ada slash, misal "tokopedia/xxx.jpg") tidak dihapus
+        if (!str_contains($image, '/')) {
+            $fullPath = public_path(self::IMAGE_DIR . DIRECTORY_SEPARATOR . basename($image));
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
     }
 }
