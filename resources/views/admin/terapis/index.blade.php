@@ -147,7 +147,9 @@
                             <td class="px-3">{{ $terapis->firstItem() + $index }}</td>
                             <td>
                                 @if($t->image)
-                                    <img src="{{ asset('storage/' . $t->image) }}" 
+                                        <img src="{{ $t->image 
+                                            ? '/images/tenaga-medis/'.$t->image 
+                                            : 'https://ui-avatars.com/api/?name='.urlencode($t->name).'&size=200&background=6c757d&color=fff&rounded=true' }}"
                                          alt="{{ $t->name }}" 
                                          class="rounded-circle" 
                                          style="width: 50px; height: 50px; object-fit: cover;">

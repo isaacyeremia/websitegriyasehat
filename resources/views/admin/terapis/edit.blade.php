@@ -35,7 +35,7 @@
                     <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Form Edit Dokter/Terapis</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.terapis.update', $doctor->id) }}" enctype="multipart/form-data" id="doctorForm">
+                    <form method="POST" action="{{ route('admin.terapis.update', $terapis->id) }}" enctype="multipart/form-data" id="terapisForm">
                         @csrf
                         @method('PUT')
 
@@ -44,7 +44,7 @@
                             <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
                             <input type="text" name="name"
                                    class="form-control @error('name') is-invalid @enderror"
-                                   value="{{ old('name', $doctor->name) }}"
+                                   value="{{ old('name', $terapis->name) }}"
                                    placeholder="Contoh: Dr. John Doe, B.Med" required>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -58,9 +58,9 @@
                             {{-- Foto saat ini --}}
                             <div class="mb-3 p-3 bg-light rounded">
                                 <label class="text-muted small fw-bold">Foto saat ini:</label><br>
-                                @if($doctor->image)
-                                    <img src="{{ asset('storage/' . $doctor->image) }}"
-                                         alt="{{ $doctor->name }}"
+                                @if($terapis->image)
+                                    <img src="{{ '/images/tenaga-medis/' . $terapis->image }}"
+                                         alt="{{ $terapis->name }}"
                                          class="img-thumbnail rounded-circle mt-1"
                                          style="width:100px; height:100px; object-fit:cover;"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
@@ -92,7 +92,7 @@
                             <label class="form-label fw-bold">Jadwal Praktik <span class="text-danger">*</span></label>
                             <input type="text" name="schedule"
                                    class="form-control @error('schedule') is-invalid @enderror"
-                                   value="{{ old('schedule', $doctor->schedule) }}"
+                                   value="{{ old('schedule', $terapis->schedule) }}"
                                    placeholder="Contoh: Senin & Rabu | 08.00-12.00" required>
                             @error('schedule')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -107,7 +107,7 @@
                             </label>
                             <div id="hargaContainer">
                                 @php
-                                    $daftarHarga = old('daftar_harga', $doctor->daftar_harga ?? []);
+                                    $daftarHarga = old('daftar_harga', $terapis->daftar_harga ?? []);
                                     $daftarHarga = is_array($daftarHarga) ? $daftarHarga : [];
                                 @endphp
                                 
@@ -152,7 +152,7 @@
                             <label class="form-label fw-bold">Urutan Tampilan</label>
                             <input type="number" name="urutan"
                                    class="form-control @error('urutan') is-invalid @enderror"
-                                   value="{{ old('urutan', $doctor->urutan ?? 0) }}"
+                                   value="{{ old('urutan', $terapis->urutan ?? 0) }}"
                                    min="0" max="999" placeholder="0">
                             @error('urutan')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -164,7 +164,7 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox"
                                        name="is_active" id="is_active" value="1"
-                                       {{ old('is_active', $doctor->is_active) ? 'checked' : '' }}>
+                                       {{ old('is_active', $terapis->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">
                                     <strong>Status Aktif</strong> - Dokter dapat dipilih untuk booking antrian
                                 </label>
@@ -176,7 +176,7 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox"
                                        name="show_in_about" id="show_in_about" value="1"
-                                       {{ old('show_in_about', $doctor->show_in_about ?? true) ? 'checked' : '' }}>
+                                       {{ old('show_in_about', $terapis->show_in_about ?? true) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="show_in_about">
                                     <strong>Tampilkan di Halaman Tentang Kami</strong> - Foto & harga layanan akan muncul di halaman About
                                 </label>
@@ -271,7 +271,7 @@ function updateFirstItemButton() {
 }
 
 // Prevent double submit
-document.getElementById('doctorForm').addEventListener('submit', function(e) {
+document.getElementById('terapisForm').addEventListener('submit', function(e) {
     const submitBtn = this.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';

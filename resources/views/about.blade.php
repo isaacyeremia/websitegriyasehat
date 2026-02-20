@@ -225,28 +225,30 @@
                                       ->get();
       @endphp
 
-      @forelse($terapis as $d)
+      @forelse($terapis as $t)
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 p-4 text-center shadow-sm hover-card">
-          <img src="{{ $d->image ? asset('storage/'.$d->image) : asset('images/default-doctor.jpg') }}"
+            <img src="{{ $t->image 
+                ? '/images/tenaga-medis/'.$t->image 
+                : 'https://ui-avatars.com/api/?name='.urlencode($t->name).'&size=200&background=6c757d&color=fff&rounded=true' }}"
                class="rounded-circle mx-auto mb-3"
                style="width:110px;height:110px;object-fit:cover; border: 3px solid #f0f0f0;"
                onerror="this.src='{{ asset('images/default-doctor.jpg') }}'">
-          <h6 class="fw-bold mb-1">{{ $d->name }}</h6>
-          @if($d->specialization)
-            <p class="text-primary small mb-2">{{ $d->specialization }}</p>
+          <h6 class="fw-bold mb-1">{{ $t->name }}</h6>
+          @if($t->specialization)
+            <p class="text-primary small mb-2">{{ $t->specialization }}</p>
           @endif
           <p class="text-muted small mb-3">
-            <i class="bi bi-clock"></i> {{ $d->schedule }}
+            <i class="bi bi-clock"></i> {{ $t->schedule }}
           </p>
           
-          @if($d->daftar_harga && count($d->daftar_harga) > 0)
+          @if($t->daftar_harga && count($t->daftar_harga) > 0)
             <div class="border-top pt-3">
               <p class="small fw-bold text-start mb-2">
                 <i class="bi bi-tag"></i> Daftar Harga:
               </p>
               <ul class="small text-start mb-0">
-                @foreach($d->daftar_harga as $h)
+                @foreach($t->daftar_harga as $h)
                   <li>{{ $h }}</li>
                 @endforeach
               </ul>

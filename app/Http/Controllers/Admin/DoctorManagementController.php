@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class DoctorManagementController extends Controller
 {
+    private function imagePath(): string
+    {
+        return public_path('../images/tenaga-medis');
+    }
     public function index(Request $request)
     {
         $query = Doctor::query();
@@ -33,12 +37,12 @@ class DoctorManagementController extends Controller
             $query->where('show_in_about', false);
         }
 
-        $doctor = $query->orderBy('urutan', 'asc')
+        $terapis = $query->orderBy('urutan', 'asc')
                          ->orderBy('name', 'asc')
                          ->paginate(10)
                          ->withQueryString();
 
-        return view('admin.terapis.index', ['terapis' => $doctor]);
+        return view('admin.terapis.index', ['terapis' => $terapis]);
     }
 
     public function create()
@@ -59,39 +63,40 @@ class DoctorManagementController extends Controller
             'urutan'         => 'nullable|integer|min:0',
         ]);
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('doctors', 'public');
-        }
+        $imageName = null;
+    if ($request->hasFile('image')) {
+        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+        $request->file('image')->move($this->imagePath(), $imageName);
+    }
 
         // Filter empty harga
         $daftarHarga = $request->daftar_harga 
             ? array_filter($request->daftar_harga, fn($v) => !empty(trim($v)))
             : [];
 
-        Doctor::create([
-            'name'           => $request->name,
-            'schedule'       => $request->schedule,
-            'image'          => $imagePath,
-            'daftar_harga'   => $daftarHarga,
-            'is_active'      => $request->boolean('is_active', true),
-            'show_in_about'  => $request->boolean('show_in_about', true),
-            'urutan'         => $request->urutan ?? 0,
+            Doctor::create([
+            'name'          => $request->name,
+            'schedule'      => $request->schedule,
+            'image'         => $imageName,  // simpan nama file saja, bukan path
+            'daftar_harga'  => $daftarHarga,
+            'is_active'     => $request->boolean('is_active', true),
+            'show_in_about' => $request->boolean('show_in_about', true),
+            'urutan'        => $request->urutan ?? 0,
         ]);
-
+    
         return redirect()->route('admin.terapis.index')
                          ->with('success', 'Dokter berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
-        $doctor = Doctor::findOrFail($id);
-        return view('admin.terapis.edit', ['terapis' => $doctor]);
+        $terapis = Doctor::findOrFail($id);
+        return view('admin.terapis.edit', ['terapis' => $terapis]);
     }
 
     public function update(Request $request, $id)
     {
-        $doctor = Doctor::findOrFail($id);
+        $terapis = Doctor::findOrFail($id);
 
         $request->validate([
             'name'           => 'required|string|max:255',
@@ -104,50 +109,52 @@ class DoctorManagementController extends Controller
             'urutan'         => 'nullable|integer|min:0',
         ]);
 
-        $imagePath = $doctor->image;
-
+            $imageName = $terapis->image;
+    
         if ($request->hasFile('image')) {
-            // Hapus gambar lama
-            if ($doctor->image) {
-                Storage::disk('public')->delete($doctor->image);
-            }
-            $imagePath = $request->file('image')->store('doctors', 'public');
+        if ($terapis->image) {
+            $oldFile = $this->imagePath() . '/' . $terapis->image;
+            if (file_exists($oldFile)) unlink($oldFile); // ← fix: fileexists bukan fileexists
         }
+        $imageName = time() . '' . $request->file('image')->getClientOriginalName(); // ← fix: '_' bukan ''
+        $request->file('image')->move($this->imagePath(), $imageName);
+    }
 
         // Filter empty harga
         $daftarHarga = $request->daftar_harga 
             ? array_filter($request->daftar_harga, fn($v) => !empty(trim($v)))
             : [];
 
-        $doctor->update([
-            'name'           => $request->name,
-            'schedule'       => $request->schedule,
-            'image'          => $imagePath,
-            'daftar_harga'   => $daftarHarga,
-            'is_active'      => $request->boolean('is_active'),
-            'show_in_about'  => $request->boolean('show_in_about'),
-            'urutan'         => $request->urutan ?? 0,
+            $terapis->update([
+            'name'          => $request->name,
+            'schedule'      => $request->schedule,
+            'image'         => $imageName,
+            'daftar_harga'  => $daftarHarga,
+            'is_active'     => $request->boolean('is_active'),
+            'show_in_about' => $request->boolean('show_in_about'),
+            'urutan'        => $request->urutan ?? 0,
         ]);
-
+    
         return redirect()->route('admin.terapis.index')
                          ->with('success', 'Dokter berhasil diupdate!');
     }
 
     public function destroy($id)
     {
-        $doctor = Doctor::findOrFail($id);
+        $terapis = Doctor::findOrFail($id);
 
         // Check if doctor has schedules or patient histories
-        if ($doctor->schedules()->count() > 0 || $doctor->patientHistories()->count() > 0) {
+        if ($terapis->schedules()->count() > 0 || $terapis->patientHistories()->count() > 0) {
             return redirect()->back()
                              ->with('error', 'Dokter tidak bisa dihapus karena masih memiliki jadwal atau riwayat pasien!');
         }
 
-        if ($doctor->image) {
-            Storage::disk('public')->delete($doctor->image);
-        }
+        if ($terapis->image) {
+        $file = $this->imagePath() . '/' . $terapis->image;
+        if (file_exists($file)) unlink($file);
+    }
 
-        $doctor->delete();
+        $terapis->delete();
 
         return redirect()->route('admin.terapis.index')
                          ->with('success', 'Dokter berhasil dihapus!');
@@ -155,8 +162,8 @@ class DoctorManagementController extends Controller
 
     public function toggleActive($id)
     {
-        $doctor = Doctor::findOrFail($id);
-        $doctor->update(['is_active' => !$doctor->is_active]);
+        $terapis = Doctor::findOrFail($id);
+        $terapis->update(['is_active' => !$terapis->is_active]);
 
         return redirect()->back()
                          ->with('success', 'Status dokter berhasil diubah!');
@@ -164,8 +171,8 @@ class DoctorManagementController extends Controller
 
     public function toggleAbout($id)
     {
-        $doctor = Doctor::findOrFail($id);
-        $doctor->update(['show_in_about' => !$doctor->show_in_about]);
+        $terapis = Doctor::findOrFail($id);
+        $terapis->update(['show_in_about' => !$terapis->show_in_about]);
 
         return redirect()->back()
                          ->with('success', 'Status tampilan About berhasil diubah!');
