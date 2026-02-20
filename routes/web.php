@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Terapis\TerapisAuthController;
 use App\Http\Controllers\Terapis\PatientManagementController;
+use App\Http\Controllers\Admin\DoctorManagementController;
 
 // ============================================================
 // ROOT / HOMEPAGE - Tampilkan home.blade.php
@@ -99,13 +100,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/patients/{id}', [AdminController::class, 'updatePatient'])->name('patients.update');
     Route::delete('/patients/{id}', [AdminController::class, 'destroyPatient'])->name('patients.destroy');
     
-    // Manajemen Terapis (Admin)
-    Route::get('/terapis', [AdminController::class, 'terapisIndex'])->name('terapis.index');
-    Route::get('/terapis/create', [AdminController::class, 'createTerapis'])->name('terapis.create');
-    Route::post('/terapis', [AdminController::class, 'storeTerapis'])->name('terapis.store');
-    Route::get('/terapis/{id}/edit', [AdminController::class, 'editTerapis'])->name('terapis.edit');
-    Route::put('/terapis/{id}', [AdminController::class, 'updateTerapis'])->name('terapis.update');
-    Route::delete('/terapis/{id}', [AdminController::class, 'destroyTerapis'])->name('terapis.destroy');
+    // Manajemen AKUN terapis (login) → AdminController → /admin/terapis-akun
+    Route::get('/terapis-akun', [AdminController::class, 'terapisIndex'])->name('terapis-akun.index');
+    Route::get('/terapis-akun/create', [AdminController::class, 'createTerapis'])->name('terapis-akun.create');
+    Route::post('/terapis-akun', [AdminController::class, 'storeTerapis'])->name('terapis-akun.store');
+    Route::get('/terapis-akun/{id}/edit', [AdminController::class, 'editTerapis'])->name('terapis-akun.edit');
+    Route::put('/terapis-akun/{id}', [AdminController::class, 'updateTerapis'])->name('terapis-akun.update');
+    Route::delete('/terapis-akun/{id}', [AdminController::class, 'destroyTerapis'])->name('terapis-akun.destroy');
+
+    // Manajemen PROFIL terapis (publik) → DoctorManagementController → /admin/terapis
+    Route::get('/terapis', [DoctorManagementController::class, 'index'])->name('terapis.index');
+    Route::get('/terapis/create', [DoctorManagementController::class, 'create'])->name('terapis.create');
+    Route::post('/terapis', [DoctorManagementController::class, 'store'])->name('terapis.store');
+    Route::get('/terapis/{id}/edit', [DoctorManagementController::class, 'edit'])->name('terapis.edit');
+    Route::put('/terapis/{id}', [DoctorManagementController::class, 'update'])->name('terapis.update');
+    Route::delete('/terapis/{id}', [DoctorManagementController::class, 'destroy'])->name('terapis.destroy');
+    Route::patch('/terapis/{id}/toggle', [DoctorManagementController::class, 'toggleActive'])->name('terapis.toggle');
     
     // Manajemen Jadwal Praktek (Admin)
     Route::get('/schedules', [\App\Http\Controllers\Admin\DoctorScheduleController::class, 'index'])->name('schedules.index');
@@ -132,6 +142,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/pharmacy/{id}', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'update'])->name('pharmacy.update');
     Route::delete('/pharmacy/{id}', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'destroy'])->name('pharmacy.destroy');
     Route::patch('/pharmacy/{id}/toggle', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'toggleStatus'])->name('pharmacy.toggle');
+
 });
 
 // ============================================================

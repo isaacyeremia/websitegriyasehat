@@ -209,102 +209,49 @@
   </div>
 </section>
 
-<!-- TENAGA MEDIS -->
+{{-- TENAGA MEDIS --}}
 <section class="section">
   <div class="container">
     <h2 class="text-center fw-bold mb-1">Tenaga Medis</h2>
     <p class="text-center text-muted mb-5">Jadwal & Harga Praktisi</p>
 
     <div class="row g-4">
-
       @php
-        $doctors = [
-          [
-            'foto'=>'catty.jpg',
-            'nama'=>'Catty Santoso, B.Med',
-            'jadwal'=>'Jumat | 13.00 – 17.00',
-            'harga'=>[
-              'Pendaftaran Rp50.000',
-              'Akupuntur Biasa (20–30 menit) Rp175.000',
-              'Akupuntur Kilat (5–10 menit) Rp50.000 / keluhan',
-              'Akupuntur Mengeluarkan Darah Rp100.000',
-              'Kop Tinggal Rp50.000',
-              'Kop Kilat Rp50.000',
-              'Kop Jalan Rp100.000',
-              'Kop Mengeluarkan Darah Rp150.000'
-            ]
-          ],
-          [
-            'foto'=>'retnawati.jpg',
-            'nama'=>'Retnawati, B.Med., B.Ed',
-            'jadwal'=>'Selasa & Kamis | 13.00 – 18.00',
-            'harga'=>[
-              'Akupuntur Rp175.000',
-              'Akupuntur Cepat Rp50.000',
-              'Kop Jalan Rp50.000',
-              'Kop Tinggal Rp50.000',
-              'Kop Lengkap Rp100.000',
-              'Konsultasi + Resep Rp50.000',
-              'Pendaftaran Rp25.000'
-            ]
-          ],
-          [
-            'foto'=>'alfredo.jpg',
-            'nama'=>'Alfredo Aldo E. P. Tjundawan, B.Med., M.MED.',
-            'jadwal'=>'Senin 08.00–13.00 | Rabu & Jumat 18.00–21.00',
-            'harga'=>[
-              'Pendaftaran Rp50.000',
-              'Akupuntur Biasa Rp175.000',
-              'Akupuntur Kilat Rp50.000 / keluhan',
-              'Akupuntur Mengeluarkan Darah Rp100.000',
-              'Kop Tinggal Rp50.000',
-              'Kop Kilat Rp50.000',
-              'Kop Jalan Rp100.000',
-              'Kop Mengeluarkan Darah Rp150.000'
-            ]
-          ],
-          [
-            'foto'=>'impian.jpg',
-            'nama'=>'Impian Delillah Jazmine, S.Tr.Battra',
-            'jadwal'=>'Selasa & Kamis | 18.00 – 21.00',
-            'harga'=>[
-              'Totok Wajah (25 menit) Rp75.000',
-              'Pengobatan Tradisional Lengkap Rp150.000',
-              'Kop Rp100.000',
-              'Pendaftaran Rp25.000'
-            ]
-          ],
-          [
-            'foto'=>'fadilla.jpg',
-            'nama'=>'Fadilla Ilmi Zarkasi, S.Tr.Battra',
-            'jadwal'=>'Selasa & Jumat | 18.00 – 21.00',
-            'harga'=>[
-              'Pengobatan Tradisional Rp150.000',
-              'Pengobatan Tradisional Khusus ABK Rp125.000',
-              'Kop Rp50.000 / bagian',
-              'Pendaftaran Rp25.000'
-            ]
-          ],
-        ];
+        // Ambil dokter yang aktif DAN show_in_about = true
+        $doctors = \App\Models\Doctor::active()
+                                      ->showInAbout()
+                                      ->ordered()
+                                      ->get();
       @endphp
 
-      @foreach($doctors as $d)
+      @forelse($doctors as $d)
       <div class="col-md-6 col-lg-4">
         <div class="card h-100 p-4 text-center">
-          <img src="{{ asset('images/tenaga-medis/'.$d['foto']) }}"
+          <img src="{{ $d->image ? asset('storage/'.$d->image) : asset('images/default-doctor.jpg') }}"
                class="rounded-circle mx-auto mb-3"
-               style="width:110px;height:110px;object-fit:cover;">
-          <h6 class="fw-bold">{{ $d['nama'] }}</h6>
-          <p class="text-muted small">{{ $d['jadwal'] }}</p>
-          <ul class="small text-start">
-            @foreach($d['harga'] as $h)
-              <li>{{ $h }}</li>
-            @endforeach
-          </ul>
+               style="width:110px;height:110px;object-fit:cover;"
+               onerror="this.src='{{ asset('images/default-doctor.jpg') }}'">
+          <h6 class="fw-bold">{{ $d->name }}</h6>
+          <p class="text-muted small">{{ $d->schedule }}</p>
+          
+          @if($d->daftar_harga && count($d->daftar_harga) > 0)
+            <ul class="small text-start">
+              @foreach($d->daftar_harga as $h)
+                <li>{{ $h }}</li>
+              @endforeach
+            </ul>
+          @else
+            <p class="text-muted small"><em>Hubungi klinik untuk info harga</em></p>
+          @endif
         </div>
       </div>
-      @endforeach
-
+      @empty
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> Data tenaga medis belum tersedia.
+          </div>
+        </div>
+      @endforelse
     </div>
   </div>
 </section>
