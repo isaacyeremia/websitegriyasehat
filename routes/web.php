@@ -116,6 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/terapis/{id}', [DoctorManagementController::class, 'update'])->name('terapis.update');
     Route::delete('/terapis/{id}', [DoctorManagementController::class, 'destroy'])->name('terapis.destroy');
     Route::patch('/terapis/{id}/toggle', [DoctorManagementController::class, 'toggleActive'])->name('terapis.toggle');
+    Route::patch('/terapis/{id}/toggle-about', [DoctorManagementController::class, 'toggleAbout'])->name('terapis.toggle-about');
     
     // Manajemen Jadwal Praktek (Admin)
     Route::get('/schedules', [\App\Http\Controllers\Admin\DoctorScheduleController::class, 'index'])->name('schedules.index');

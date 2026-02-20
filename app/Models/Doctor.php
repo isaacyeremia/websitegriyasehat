@@ -8,7 +8,6 @@ class Doctor extends Model
 {
     protected $fillable = [
         'name',
-        'kondisi_minat_klinis',
         'schedule',
         'image',
         'is_active',

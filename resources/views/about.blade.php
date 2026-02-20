@@ -218,30 +218,45 @@
     <div class="row g-4">
       @php
         // Ambil dokter yang aktif DAN show_in_about = true
-        $doctors = \App\Models\Doctor::active()
-                                      ->showInAbout()
-                                      ->ordered()
+        $terapis = \App\Models\Doctor::where('is_active', true)
+                                      ->where('show_in_about', true)
+                                      ->orderBy('urutan', 'asc')
+                                      ->orderBy('name', 'asc')
                                       ->get();
       @endphp
 
-      @forelse($doctors as $d)
+      @forelse($terapis as $d)
       <div class="col-md-6 col-lg-4">
-        <div class="card h-100 p-4 text-center">
+        <div class="card h-100 p-4 text-center shadow-sm hover-card">
           <img src="{{ $d->image ? asset('storage/'.$d->image) : asset('images/default-doctor.jpg') }}"
                class="rounded-circle mx-auto mb-3"
-               style="width:110px;height:110px;object-fit:cover;"
+               style="width:110px;height:110px;object-fit:cover; border: 3px solid #f0f0f0;"
                onerror="this.src='{{ asset('images/default-doctor.jpg') }}'">
-          <h6 class="fw-bold">{{ $d->name }}</h6>
-          <p class="text-muted small">{{ $d->schedule }}</p>
+          <h6 class="fw-bold mb-1">{{ $d->name }}</h6>
+          @if($d->specialization)
+            <p class="text-primary small mb-2">{{ $d->specialization }}</p>
+          @endif
+          <p class="text-muted small mb-3">
+            <i class="bi bi-clock"></i> {{ $d->schedule }}
+          </p>
           
           @if($d->daftar_harga && count($d->daftar_harga) > 0)
-            <ul class="small text-start">
-              @foreach($d->daftar_harga as $h)
-                <li>{{ $h }}</li>
-              @endforeach
-            </ul>
+            <div class="border-top pt-3">
+              <p class="small fw-bold text-start mb-2">
+                <i class="bi bi-tag"></i> Daftar Harga:
+              </p>
+              <ul class="small text-start mb-0">
+                @foreach($d->daftar_harga as $h)
+                  <li>{{ $h }}</li>
+                @endforeach
+              </ul>
+            </div>
           @else
-            <p class="text-muted small"><em>Hubungi klinik untuk info harga</em></p>
+            <div class="border-top pt-3">
+              <p class="text-muted small mb-0">
+                <i class="bi bi-telephone"></i> <em>Hubungi klinik untuk info harga</em>
+              </p>
+            </div>
           @endif
         </div>
       </div>
@@ -268,8 +283,9 @@
   </div>
 </section>
 
-<!-- Custom CSS untuk Carousel -->
+<!-- Custom CSS -->
 <style>
+  /* Carousel Controls */
   .carousel-control-prev,
   .carousel-control-next {
     width: 5%;
@@ -295,6 +311,18 @@
     min-height: 600px;
   }
 
+  /* Doctor Card Hover Effect */
+  .hover-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    border-color: #007bff;
+  }
+
   .bg-light {
     background-color: #f8f9fa !important;
   }
@@ -309,5 +337,8 @@
     }
   }
 </style>
+
+{{-- Bootstrap Icons --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 @endsection

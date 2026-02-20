@@ -50,7 +50,6 @@ class DoctorManagementController extends Controller
     {
         $request->validate([
             'name'           => 'required|string|max:255',
-            'kondisi_minat_klinis' => 'nullable|string|max:255',
             'schedule'       => 'required|string',
             'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'daftar_harga'   => 'nullable|array',
@@ -72,7 +71,6 @@ class DoctorManagementController extends Controller
 
         Doctor::create([
             'name'           => $request->name,
-            'kondisi_minat_klinis' => $request->kondisi_minat_klinis,
             'schedule'       => $request->schedule,
             'image'          => $imagePath,
             'daftar_harga'   => $daftarHarga,
@@ -97,7 +95,6 @@ class DoctorManagementController extends Controller
 
         $request->validate([
             'name'           => 'required|string|max:255',
-            'kondisi_minat_klinis' => 'nullable|string|max:255',
             'schedule'       => 'required|string',
             'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'daftar_harga'   => 'nullable|array',
@@ -124,7 +121,6 @@ class DoctorManagementController extends Controller
 
         $doctor->update([
             'name'           => $request->name,
-            'kondisi_minat_klinis' => $request->kondisi_minat_klinis,
             'schedule'       => $request->schedule,
             'image'          => $imagePath,
             'daftar_harga'   => $daftarHarga,
