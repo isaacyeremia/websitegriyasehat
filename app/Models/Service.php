@@ -8,9 +8,9 @@ class Service extends Model
 {
     protected $fillable = [
         'name',
-        'description',
         'icon',
         'is_active',
+        'duration_minutes',
     ];
 
     protected $casts = [

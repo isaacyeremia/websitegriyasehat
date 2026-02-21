@@ -80,7 +80,7 @@
                                 <i class="bi bi-hospital"></i> Layanan/Poli 
                                 <span class="text-danger">*</span>
                             </label>
-                            <select name="poli" class="form-select form-select-lg" required>
+                            <select name="poli" id="selectPoli" class="form-select form-select-lg" required>
                                 <option value="">-- Pilih Layanan --</option>
                                 @foreach($services as $service)
                                     <option value="{{ $service->name }}" {{ old('poli') == $service->name ? 'selected' : '' }}>
@@ -88,9 +88,15 @@
                                     </option>
                                 @endforeach
                             </select>
+                            {{-- Info durasi layanan --}}
+                            <div id="durasiInfo" class="mt-2" style="display:none;">
+                                <small class="text-info fw-bold">
+                                    <i class="bi bi-hourglass-split"></i> Estimasi durasi layanan: <span id="durasiText"></span> menit
+                                </small>
+                            </div>
                         </div>
 
-                        {{-- Pilih Tanggal (PRIORITAS PERTAMA) --}}
+                        {{-- Pilih Tanggal --}}
                         <div class="mb-4">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-calendar-event"></i> Tanggal Kunjungan 
@@ -108,7 +114,7 @@
                             </small>
                         </div>
 
-                        {{-- Pilih Dokter (MUNCUL SETELAH TANGGAL) --}}
+                        {{-- Pilih Dokter --}}
                         <div class="mb-4">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-person-badge"></i> Pilih Dokter/Terapis 
@@ -135,7 +141,7 @@
                             </div>
                         </div>
 
-                        {{-- Pilih Jam (TIME PICKER) --}}
+                        {{-- Pilih Jam --}}
                         <div class="mb-4">
                             <label class="form-label fw-bold">
                                 <i class="bi bi-clock"></i> Jam Kunjungan 
@@ -182,7 +188,6 @@
         {{-- SIDEBAR INFO --}}
         <div class="col-lg-4">
             
-            {{-- Info Antrian Hari Ini --}}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-info text-white">
                     <h6 class="mb-0"><i class="bi bi-info-circle"></i> Info Antrian Hari Ini</h6>
@@ -203,7 +208,6 @@
                 </div>
             </div>
 
-            {{-- Panduan --}}
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
                     <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Panduan Booking</h6>
@@ -212,7 +216,7 @@
                     <ol class="mb-0 ps-3">
                         <li class="mb-2">Pilih layanan/poli yang dibutuhkan</li>
                         <li class="mb-2"><strong>Pilih tanggal kunjungan</strong></li>
-                        <li class="mb-2">Sistem akan menampilkan dokter yang tersedia di tanggal tersebut</li>
+                        <li class="mb-2">Sistem akan menampilkan dokter yang tersedia</li>
                         <li class="mb-2">Pilih dokter (lihat kuota tersedia)</li>
                         <li class="mb-2">Pilih jam kunjungan sesuai jam praktek</li>
                         <li class="mb-2">Jelaskan keluhan (opsional)</li>
@@ -249,68 +253,66 @@
                     </thead>
                     <tbody>
                         @foreach($userQueues as $queue)
-                    <tr>
-                        <td><strong class="text-primary">{{ $queue->kode_antrian }}</strong></td>
-                        <td>{{ $queue->patient_name }}</td>
-                        <td>{{ $queue->patient_nik ?? '-' }}</td>
-                        <td>{{ $queue->poli }}</td>
-                        <td>{{ $queue->dokter }}</td>
-                        <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
-                        <td>
-                            @if($queue->appointment_time)
-                                <i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($queue->appointment_time)->format('H:i') }}
-                            @else
-                                -
-                            @endif
-                        </td>
-                               <td>
-                <span class="badge 
-                    @if($queue->status == 'Menunggu') bg-warning text-dark
-                    @elseif($queue->status == 'Dipanggil') bg-info
-                    @elseif($queue->status == 'Selesai') bg-success
-                    @else bg-secondary
-                    @endif
-                ">
-                    {{ $queue->status }}
-                </span>
-            </td>
-            <td>
-                <span class="badge 
-                    @if($queue->arrival_status == 'Belum Hadir') bg-secondary
-                    @elseif($queue->arrival_status == 'Sudah Hadir') bg-success
-                    @else bg-danger
-                    @endif
-                ">
-                    {{ $queue->arrival_status }}
-                </span>
-                @if($queue->confirmed_at)
-                    <br><small class="text-muted">{{ \Carbon\Carbon::parse($queue->confirmed_at)->format('H:i') }}</small>
-                @endif
-            </td>
-            <td class="text-center">
-                @if($queue->status == 'Menunggu' && $queue->tanggal == now()->toDateString())
-                    @if($queue->arrival_status == 'Belum Hadir')
-                        <form method="POST" action="{{ route('booking.confirm-arrival', $queue->id) }}" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-success" title="Konfirmasi Kedatangan">
-                                <i class="bi bi-check-circle"></i> Konfirmasi Hadir
-                            </button>
-                        </form>
-                    @else
-                        <form method="POST" action="{{ route('booking.cancel-arrival', $queue->id) }}" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-warning" title="Batalkan Konfirmasi">
-                                <i class="bi bi-x-circle"></i> Batal
-                            </button>
-                        </form>
-                    @endif
-                @else
-                    <span class="text-muted">-</span>
-                @endif
-            </td>
-        </tr>
-    @endforeach
-</tbody>
+                        <tr>
+                            <td><strong class="text-primary">{{ $queue->kode_antrian }}</strong></td>
+                            <td>{{ $queue->patient_name }}</td>
+                            <td>{{ $queue->patient_nik ?? '-' }}</td>
+                            <td>{{ $queue->poli }}</td>
+                            <td>{{ $queue->dokter }}</td>
+                            <td>{{ \Carbon\Carbon::parse($queue->tanggal)->format('d M Y') }}</td>
+                            <td>
+                                @if($queue->appointment_time)
+                                    <i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($queue->appointment_time)->format('H:i') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    @if($queue->status == 'Menunggu') bg-warning text-dark
+                                    @elseif($queue->status == 'Dipanggil') bg-info
+                                    @elseif($queue->status == 'Selesai') bg-success
+                                    @else bg-secondary
+                                    @endif">
+                                    {{ $queue->status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    @if($queue->arrival_status == 'Belum Hadir') bg-secondary
+                                    @elseif($queue->arrival_status == 'Sudah Hadir') bg-success
+                                    @else bg-danger
+                                    @endif">
+                                    {{ $queue->arrival_status }}
+                                </span>
+                                @if($queue->confirmed_at)
+                                    <br><small class="text-muted">{{ \Carbon\Carbon::parse($queue->confirmed_at)->format('H:i') }}</small>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($queue->status == 'Menunggu' && $queue->tanggal == now()->toDateString())
+                                    @if($queue->arrival_status == 'Belum Hadir')
+                                        <form method="POST" action="{{ route('booking.confirm-arrival', $queue->id) }}" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="bi bi-check-circle"></i> Konfirmasi Hadir
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('booking.cancel-arrival', $queue->id) }}" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-warning">
+                                                <i class="bi bi-x-circle"></i> Batal
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         @else
@@ -328,27 +330,51 @@
 @endsection
 
 @push('scripts')
+@verbatim
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const selectPoli    = document.getElementById('selectPoli');
     const selectTanggal = document.getElementById('selectTanggal');
-    const selectDokter = document.getElementById('selectDokter');
-    const selectTime = document.getElementById('selectTime');
-    const doctorInfo = document.getElementById('doctorInfo');
+    const selectDokter  = document.getElementById('selectDokter');
+    const selectTime    = document.getElementById('selectTime');
+    const doctorInfo    = document.getElementById('doctorInfo');
     const practiceHours = document.getElementById('practiceHours');
-    const quotaInfo = document.getElementById('quotaInfo');
+    const quotaInfo     = document.getElementById('quotaInfo');
     const timeRangeInfo = document.getElementById('timeRangeInfo');
-    const submitBtn = document.getElementById('submitBtn');
+    const submitBtn     = document.getElementById('submitBtn');
     const bookedSlotsWarning = document.getElementById('bookedSlotsWarning');
-    const bookedSlotsText = document.getElementById('bookedSlotsText');
+    const bookedSlotsText    = document.getElementById('bookedSlotsText');
+    const durasiInfo    = document.getElementById('durasiInfo');
+    const durasiText    = document.getElementById('durasiText');
 
     let currentDoctorData = null;
-    let bookedSlots = [];
+    let bookedSlots       = [];
+    let serviceDurations  = {};
+    let currentDurasi     = 20;
 
-    // Event: Saat tanggal dipilih - LOAD AVAILABLE DOCTORS
+    // Fetch semua durasi layanan saat halaman load
+    fetch('/api/service-durations')
+        .then(function(r) { return r.json(); })
+        .then(function(data) { serviceDurations = data; })
+        .catch(function(e) { console.error('Gagal load durasi:', e); });
+
+    // Event: Poli berubah → tampilkan durasi
+    selectPoli.addEventListener('change', function() {
+        var namaLayanan = this.value;
+        if (namaLayanan && serviceDurations[namaLayanan]) {
+            currentDurasi = serviceDurations[namaLayanan];
+            durasiText.textContent = currentDurasi;
+            durasiInfo.style.display = 'block';
+        } else {
+            currentDurasi = 20;
+            durasiInfo.style.display = 'none';
+        }
+    });
+
+    // Event: Tanggal berubah → load dokter tersedia
     selectTanggal.addEventListener('change', function() {
-        const selectedDate = this.value;
+        var selectedDate = this.value;
         
-        // Reset
         selectDokter.innerHTML = '<option value="">-- Memuat dokter tersedia... --</option>';
         selectDokter.disabled = true;
         selectTime.value = '';
@@ -362,10 +388,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Fetch available doctors untuk tanggal ini
-        fetch(`/api/available-doctors/${selectedDate}`)
-            .then(response => response.json())
-            .then(doctors => {
+        fetch('/api/available-doctors/' + selectedDate)
+            .then(function(response) { return response.json(); })
+            .then(function(doctors) {
                 selectDokter.innerHTML = '<option value="">-- Pilih Dokter/Terapis --</option>';
                 
                 if (doctors.length === 0) {
@@ -374,30 +399,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                doctors.forEach(doctor => {
-                    const option = document.createElement('option');
+                doctors.forEach(function(doctor) {
+                    var option = document.createElement('option');
                     option.value = doctor.name;
-                    option.setAttribute('data-doctor-id', doctor.id);
                     option.setAttribute('data-start-time', doctor.start_time);
                     option.setAttribute('data-end-time', doctor.end_time);
                     option.setAttribute('data-quota-left', doctor.quota_left);
                     option.setAttribute('data-total-quota', doctor.total_quota);
-                    option.textContent = `${doctor.name} - ${doctor.specialization} (Kuota: ${doctor.quota_left}/${doctor.total_quota})`;
+                    option.textContent = doctor.name + ' (Kuota: ' + doctor.quota_left + '/' + doctor.total_quota + ')';
                     selectDokter.appendChild(option);
                 });
 
                 selectDokter.disabled = false;
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error:', error);
-                alert('Gagal memuat data dokter. Silakan coba lagi.');
-                selectDokter.innerHTML = '<option value="">-- Error loading doctors --</option>';
+                selectDokter.innerHTML = '<option value="">-- Gagal memuat dokter --</option>';
             });
     });
 
-    // Event: Saat dokter dipilih
+    // Event: Dokter berubah → tampilkan info & load booked slots
     selectDokter.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
+        var selectedOption = this.options[this.selectedIndex];
         
         selectTime.value = '';
         selectTime.disabled = true;
@@ -410,21 +433,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const startTime = selectedOption.getAttribute('data-start-time');
-        const endTime = selectedOption.getAttribute('data-end-time');
-        const quotaLeft = selectedOption.getAttribute('data-quota-left');
-        const totalQuota = selectedOption.getAttribute('data-total-quota');
+        var startTime  = selectedOption.getAttribute('data-start-time');
+        var endTime    = selectedOption.getAttribute('data-end-time');
+        var quotaLeft  = selectedOption.getAttribute('data-quota-left');
+        var totalQuota = selectedOption.getAttribute('data-total-quota');
 
-        // Tampilkan info dokter
-        practiceHours.innerHTML = `${startTime} - ${endTime}`;
-        quotaInfo.innerHTML = `<span class="badge ${quotaLeft > 5 ? 'bg-success' : 'bg-warning text-dark'}">${quotaLeft}/${totalQuota} tersedia</span>`;
+        practiceHours.innerHTML = startTime + ' - ' + endTime;
+        quotaInfo.innerHTML = '<span class="badge ' + (quotaLeft > 5 ? 'bg-success' : 'bg-warning text-dark') + '">' + quotaLeft + '/' + totalQuota + ' tersedia</span>';
         doctorInfo.style.display = 'block';
 
-        // Set time constraints
         selectTime.min = startTime;
         selectTime.max = endTime;
         selectTime.disabled = false;
-        timeRangeInfo.innerHTML = `<i class="bi bi-info-circle"></i> Jam praktek: ${startTime} - ${endTime}`;
+        timeRangeInfo.innerHTML = '<i class="bi bi-info-circle"></i> Jam praktek: ' + startTime + ' - ' + endTime;
 
         currentDoctorData = {
             name: this.value,
@@ -432,42 +453,45 @@ document.addEventListener('DOMContentLoaded', function() {
             endTime: endTime
         };
 
-        // Fetch booked slots
-        const selectedDate = selectTanggal.value;
-        fetch(`/api/booked-slots/${encodeURIComponent(this.value)}/${selectedDate}`)
-            .then(response => response.json())
-            .then(slots => {
-                bookedSlots = slots;
-                if (slots.length > 0) {
-                    bookedSlotsText.innerHTML = `Jam yang sudah dibooking: <strong>${slots.join(', ')}</strong>`;
+        var selectedDate = selectTanggal.value;
+        fetch('/api/booked-slots/' + encodeURIComponent(this.value) + '/' + selectedDate)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (Array.isArray(data)) {
+                    bookedSlots = data;
+                } else {
+                    bookedSlots = (data.booked || []).concat(data.blocked || []);
+                }
+
+                if (data.booked && data.booked.length > 0) {
+                    bookedSlotsText.innerHTML = 'Jam yang sudah dibooking: <strong>' + data.booked.join(', ') + 
+                        '</strong> (jeda layanan ' + currentDurasi + ' menit tidak tersedia)';
                     bookedSlotsWarning.style.display = 'block';
                 }
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error fetching booked slots:', error);
             });
     });
 
-    // Event: Saat jam dipilih - validate
+    // Event: Jam berubah → validasi
     selectTime.addEventListener('change', function() {
-        const selectedTime = this.value;
+        var selectedTime = this.value;
         
         if (!selectedTime || !currentDoctorData) {
             submitBtn.disabled = true;
             return;
         }
 
-        // Validasi apakah jam dalam range
         if (selectedTime < currentDoctorData.startTime || selectedTime > currentDoctorData.endTime) {
-            alert(`Jam harus antara ${currentDoctorData.startTime} - ${currentDoctorData.endTime}`);
+            alert('Jam harus antara ' + currentDoctorData.startTime + ' - ' + currentDoctorData.endTime);
             this.value = '';
             submitBtn.disabled = true;
             return;
         }
 
-        // Validasi apakah jam sudah dibooking
         if (bookedSlots.includes(selectedTime)) {
-            alert(`Jam ${selectedTime} sudah dibooking oleh pasien lain. Silakan pilih jam lain.`);
+            alert('Jam ' + selectedTime + ' tidak tersedia (terlalu berdekatan dengan booking lain). Silakan pilih jam lain.');
             this.value = '';
             submitBtn.disabled = true;
             return;
@@ -476,33 +500,34 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = false;
     });
 
-    // Form validation before submit
+    // Submit validation
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
-        const selectedDate = selectTanggal.value;
-        const selectedTime = selectTime.value;
-        const selectedDokter = selectDokter.value;
+        var selectedDate   = selectTanggal.value;
+        var selectedTime   = selectTime.value;
+        var selectedDokter = selectDokter.value;
+        var selectedPoli   = selectPoli.value;
 
-        if (!selectedDate || !selectedTime || !selectedDokter) {
+        if (!selectedDate || !selectedTime || !selectedDokter || !selectedPoli) {
             e.preventDefault();
             alert('Mohon lengkapi semua data');
             return false;
         }
 
-        // Final validation
         if (currentDoctorData) {
             if (selectedTime < currentDoctorData.startTime || selectedTime > currentDoctorData.endTime) {
                 e.preventDefault();
-                alert(`Jam kunjungan harus antara ${currentDoctorData.startTime} - ${currentDoctorData.endTime}`);
+                alert('Jam kunjungan harus antara ' + currentDoctorData.startTime + ' - ' + currentDoctorData.endTime);
                 return false;
             }
         }
 
         if (bookedSlots.includes(selectedTime)) {
             e.preventDefault();
-            alert('Jam yang Anda pilih sudah dibooking oleh pasien lain. Silakan refresh halaman dan pilih jam lain.');
+            alert('Jam yang Anda pilih tidak tersedia. Silakan pilih jam lain.');
             return false;
         }
     });
 });
 </script>
+@endverbatim
 @endpush

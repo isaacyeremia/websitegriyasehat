@@ -59,7 +59,6 @@
                                     <td>{{ $schedules->firstItem() + $index }}</td>
                                     <td>
                                         <strong>{{ $schedule->doctor->name ?? 'N/A' }}</strong><br>
-                                        <small class="text-muted">{{ $schedule->doctor->specialization ?? 'N/A' }}</small>
                                     </td>
                                     <td>
                                         <span class="badge bg-info">{{ $schedule->day_of_week }}</span>

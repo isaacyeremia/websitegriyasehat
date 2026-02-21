@@ -40,7 +40,7 @@
                                 <option value="">-- Pilih Dokter/Terapis --</option>
                                 @foreach($doctors as $doctor)
                                     <option value="{{ $doctor->id }}" {{ old('doctor_id', $schedule->doctor_id) == $doctor->id ? 'selected' : '' }}>
-                                        {{ $doctor->name }} - {{ $doctor->specialization }}
+                                        {{ $doctor->name }}
                                     </option>
                                 @endforeach
                             </select>

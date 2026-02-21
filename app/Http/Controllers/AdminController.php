@@ -40,7 +40,9 @@ class AdminController extends Controller
             $query->whereDate('tanggal', $request->date);
         }
 
-        $antrians = $query->orderBy('created_at', 'desc')->paginate(20);
+        $antrians = $query->orderBy('tanggal', 'asc')
+                          ->orderBy('appointment_time', 'asc')
+                          ->paginate(20);
 
         return view('admin.dashboard', compact('statistik', 'antrians'));
     }
