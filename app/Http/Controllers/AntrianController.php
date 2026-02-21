@@ -86,6 +86,39 @@ class AntrianController extends Controller
             ])->withInput();
         }
 
+        $bookingUserJamLain = PatientHistory::where('user_id', Auth::id())
+            ->where('tanggal', $validated['tanggal'])
+            ->where('dokter', '!=', $validated['dokter']) // dokter LAIN
+            ->whereNotIn('status', ['Dibatalkan'])
+            ->get();
+
+        foreach ($bookingUserJamLain as $existingBooking) {
+            // Ambil durasi layanan booking yang sudah ada
+            $existingService  = \App\Models\Service::where('name', $existingBooking->poli)->first();
+            $existingDurasi   = $existingService ? $existingService->duration_minutes : 20;
+
+            $existingJam      = \Carbon\Carbon::parse($existingBooking->appointment_time);
+            $existingJamMulai = $existingJam->copy()->format('H:i:s');
+            $existingJamSelesai = $existingJam->copy()->addMinutes($existingDurasi)->format('H:i:s');
+
+            // Durasi layanan baru
+            $newJam      = \Carbon\Carbon::createFromFormat('H:i', $validated['appointment_time']);
+            $newJamMulai = $newJam->copy()->format('H:i:s');
+            $newJamSelesai = $newJam->copy()->addMinutes($durasiMenit)->format('H:i:s');
+
+            // Cek apakah range waktu overlap
+            $overlap = $newJamMulai < $existingJamSelesai && $newJamSelesai > $existingJamMulai;
+
+            if ($overlap) {
+                return back()->withErrors([
+                    'appointment_time' => 'Anda sudah punya booking dengan ' . $existingBooking->dokter .
+                        ' di jam ' . \Carbon\Carbon::parse($existingBooking->appointment_time)->format('H:i') .
+                        ' (' . $existingBooking->poli . ', ' . $existingDurasi . ' menit). ' .
+                        'Waktu tersebut bertabrakan dengan booking ini.'
+                ])->withInput();
+            }
+        }
+
         // VALIDASI 3: Slot waktu persis sudah dibooking
         $existingSlotBooking = PatientHistory::where('tanggal', $validated['tanggal'])
             ->where('appointment_time', $validated['appointment_time'])
