@@ -225,12 +225,12 @@ class AdminController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->paginate(20);
 
-        return view('admin.terapis-akun.index', compact('terapis'));
+        return view('admin.terapis.index', compact('terapis'));
     }
 
     public function createTerapis()
     {
-        return view('admin.terapis-akun.create');
+        return view('admin.terapis.create');
     }
 
     public function storeTerapis(Request $request)
@@ -252,14 +252,14 @@ class AdminController extends Controller
             'role'     => 'terapis',
         ]);
 
-        return redirect()->route('admin.terapis-akun.index')
+        return redirect()->route('admin.terapis.index')
                         ->with('success', 'Akun terapis berhasil dibuat! Username: ' . $validated['phone']);
     }
 
     public function editTerapis($id)
     {
         $terapis = User::where('role', 'terapis')->findOrFail($id);
-        return view('admin.terapis-akun.edit', compact('terapis'));
+        return view('admin.terapis.edit', compact('terapis'));
     }
 
     public function updateTerapis(Request $request, $id)
@@ -285,7 +285,7 @@ class AdminController extends Controller
             $terapis->update(['password' => Hash::make($validated['password'])]);
         }
 
-        return redirect()->route('admin.terapis-akun.index')
+        return redirect()->route('admin.terapis.index')
                         ->with('success', 'Data terapis berhasil diupdate');
     }
 
@@ -297,7 +297,7 @@ class AdminController extends Controller
         $terapis->medicalRecordsAsTerapis()->delete();
         $terapis->delete();
 
-        return redirect()->route('admin.terapis-akun.index')
+        return redirect()->route('admin.terapis.index')
                         ->with('success', 'Akun terapis ' . $name . ' berhasil dihapus');
     }
 

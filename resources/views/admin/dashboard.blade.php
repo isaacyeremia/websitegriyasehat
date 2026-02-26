@@ -148,7 +148,7 @@
             </a>
         </div>
         <div class="col-md-3 col-sm-6">
-            <a href="{{ route('admin.terapis-akun.index') }}" class="action-card">
+            <a href="{{ route('admin.terapis.index') }}" class="action-card">
                 <div class="action-icon bg-success"><i class="bi bi-person-badge"></i></div>
                 <div class="action-content"><h5>Kelola Terapis</h5><p>Manajemen terapis</p></div>
                 <div class="action-arrow"><i class="bi bi-arrow-right"></i></div>

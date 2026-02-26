@@ -102,12 +102,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/patients/{id}', [AdminController::class, 'destroyPatient'])->name('patients.destroy');
     
     // Manajemen AKUN terapis
-    Route::get('/terapis-akun', [AdminController::class, 'terapisIndex'])->name('terapis-akun.index');
-    Route::get('/terapis-akun/create', [AdminController::class, 'createTerapis'])->name('terapis-akun.create');
-    Route::post('/terapis-akun', [AdminController::class, 'storeTerapis'])->name('terapis-akun.store');
-    Route::get('/terapis-akun/{id}/edit', [AdminController::class, 'editTerapis'])->name('terapis-akun.edit');
-    Route::put('/terapis-akun/{id}', [AdminController::class, 'updateTerapis'])->name('terapis-akun.update');
-    Route::delete('/terapis-akun/{id}', [AdminController::class, 'destroyTerapis'])->name('terapis-akun.destroy');
+    Route::get('/terapis', [AdminController::class, 'terapisIndex'])->name('terapis.index');
+    Route::get('/terapis/create', [AdminController::class, 'createTerapis'])->name('terapis.create');
+    Route::post('/terapis', [AdminController::class, 'storeTerapis'])->name('terapis.store');
+    Route::get('/terapis/{id}/edit', [AdminController::class, 'editTerapis'])->name('terapis.edit');
+    Route::put('/terapis/{id}', [AdminController::class, 'updateTerapis'])->name('terapis.update');
+    Route::delete('/terapis/{id}', [AdminController::class, 'destroyTerapis'])->name('terapis.destroy');
     
     // Manajemen Jadwal Praktek (Admin)
     Route::get('/schedules', [\App\Http\Controllers\Admin\DoctorScheduleController::class, 'index'])->name('schedules.index');
