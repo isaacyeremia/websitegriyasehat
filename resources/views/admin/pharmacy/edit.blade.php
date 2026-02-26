@@ -93,23 +93,20 @@
                             <label class="form-label fw-bold">Gambar Produk</label>
 
                             {{-- Gambar saat ini --}}
-                            <div class="mb-2">
-                                <small class="text-muted d-block mb-1">Gambar saat ini:</small>
-                                @if($product->image)
-                                    @php
-                                        $isNewUpload = !str_contains($product->image, '/');
-                                        $imgSrc = $isNewUpload
-                                            ? asset('images/pharmacy-products/' . $product->image)
-                                            : asset($product->image);
-                                    @endphp
-                                    <img src="{{ $imgSrc }}"
+                            @if($product->image)
+                                <div class="mb-2">
+                                    <small class="text-muted d-block mb-1">Gambar saat ini:</small>
+                                    <img src="{{ asset('images/pharmacy-products/' . $product->image) }}"
                                          alt="{{ $product->name }}"
-                                         class="img-thumbnail"
-                                         style="max-width:200px;">
-                                @else
+                                         class="img-thumbnail d-block"
+                                         style="max-width:200px;max-height:200px;object-fit:contain;"
+                                         onerror="this.outerHTML='<div class=&quot;alert alert-warning py-1 px-2 d-inline-block&quot; style=&quot;font-size:.85rem&quot;><i class=&quot;bi bi-exclamation-triangle&quot;></i> Gambar tidak ditemukan di server</div>'">
+                                </div>
+                            @else
+                                <div class="mb-2">
                                     <span class="badge bg-secondary">Tidak ada gambar</span>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
 
                             {{-- Upload baru --}}
                             <input type="file" name="image" id="imageInput"
@@ -171,8 +168,6 @@
         </div>
     </div>
 </div>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <script>
 document.getElementById('imageInput').addEventListener('change', function (e) {

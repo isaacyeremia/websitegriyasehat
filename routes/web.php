@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/doctor/{id}/available-dates', [AntrianController::class, 'getAvailableDates'])->name('api.doctor.dates');
     Route::get('/api/available-doctors/{date}', [AntrianController::class, 'getAvailableDoctors'])->name('api.available.doctors');
     Route::get('/api/booked-slots/{doctorName}/{date}', [AntrianController::class, 'getBookedSlots'])->name('api.booked.slots');
+    Route::get('/api/service-durations', [AntrianController::class, 'getServiceDurations'])->name('api.service.durations');
 });
 
 // ============================================================

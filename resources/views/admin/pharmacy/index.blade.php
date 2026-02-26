@@ -3,6 +3,40 @@
 @section('title', 'Kelola Produk Apotek')
 
 @section('content')
+
+<style>
+.stat-card {
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.stat-card.bg-primary   { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); }
+.stat-card.bg-success   { background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); }
+.stat-card.bg-secondary { background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); }
+.stat-card.bg-info      { background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%); }
+.stat-icon { font-size: 2.5rem; opacity: 0.9; }
+.stat-content h3 { font-size: 2rem; font-weight: 700; margin: 0; }
+.stat-content p  { margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; }
+
+/* Pagination */
+.pagination-wrapper { font-size: 0.82rem; }
+.pagination-wrapper nav { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.pagination-wrapper svg { width: 14px !important; height: 14px !important; }
+.pagination-wrapper span[aria-current] > span,
+.pagination-wrapper a {
+    padding: 4px 10px !important;
+    font-size: 0.82rem !important;
+    min-width: auto !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+</style>
+
 <div class="container-fluid py-4">
 
     {{-- Header --}}
@@ -40,37 +74,25 @@
         <div class="col-md-3">
             <div class="stat-card bg-primary">
                 <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
-                <div class="stat-content">
-                    <h3>{{ $products->total() }}</h3>
-                    <p>Total Produk</p>
-                </div>
+                <div class="stat-content"><h3>{{ $products->total() }}</h3><p>Total Produk</p></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stat-card bg-success">
                 <div class="stat-icon"><i class="bi bi-eye"></i></div>
-                <div class="stat-content">
-                    <h3>{{ $products->where('is_active', true)->count() }}</h3>
-                    <p>Produk Aktif</p>
-                </div>
+                <div class="stat-content"><h3>{{ $products->where('is_active', true)->count() }}</h3><p>Produk Aktif</p></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stat-card bg-secondary">
                 <div class="stat-icon"><i class="bi bi-eye-slash"></i></div>
-                <div class="stat-content">
-                    <h3>{{ $products->where('is_active', false)->count() }}</h3>
-                    <p>Produk Nonaktif</p>
-                </div>
+                <div class="stat-content"><h3>{{ $products->where('is_active', false)->count() }}</h3><p>Produk Nonaktif</p></div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stat-card bg-info">
                 <div class="stat-icon"><i class="bi bi-link-45deg"></i></div>
-                <div class="stat-content">
-                    <h3>{{ $products->whereNotNull('tokopedia_link')->count() }}</h3>
-                    <p>Dengan Link</p>
-                </div>
+                <div class="stat-content"><h3>{{ $products->whereNotNull('tokopedia_link')->count() }}</h3><p>Dengan Link</p></div>
             </div>
         </div>
     </div>
@@ -115,9 +137,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel"></i> Filter
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
                     <a href="{{ route('admin.pharmacy.index') }}" class="btn btn-secondary w-100 mt-2">
                         <i class="bi bi-arrow-clockwise"></i> Reset
                     </a>
@@ -158,16 +178,11 @@
                                 {{-- Gambar --}}
                                 <td>
                                     @if($product->image)
-                                        @php
-                                            $isNewUpload = !str_contains($product->image, '/');
-                                            $imgSrc = $isNewUpload
-                                                ? asset('images/pharmacy-products/' . $product->image)
-                                                : asset($product->image);
-                                        @endphp
-                                        <img src="{{ $imgSrc }}"
+                                        <img src="{{ asset('images/pharmacy-products/' . $product->image) }}"
                                              alt="{{ $product->name }}"
                                              class="img-thumbnail"
-                                             style="width:60px;height:60px;object-fit:cover;">
+                                             style="width:60px;height:60px;object-fit:cover;flex-shrink:0;"
+                                             onerror="this.style.display='none'">
                                     @else
                                         <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
                                              style="width:60px;height:60px;border-radius:8px;">
@@ -207,8 +222,6 @@
                                     </strong>
                                 </td>
 
-                                {{-- Stok dihapus - lihat stok & beli via link Tokopedia --}}
-
                                 {{-- Link --}}
                                 <td>
                                     @if($product->tokopedia_link)
@@ -221,16 +234,17 @@
                                     @endif
                                 </td>
 
-                                {{-- Status Toggle --}}
+                                {{-- Status Toggle — pakai modal konfirmasi --}}
                                 <td>
                                     <form method="POST"
                                           action="{{ route('admin.pharmacy.toggle', $product->id) }}"
-                                          class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit"
-                                                class="btn btn-sm {{ $product->is_active ? 'btn-success' : 'btn-secondary' }}"
-                                                onclick="return confirm('Ubah status produk {{ $product->name }}?')">
+                                          class="d-inline confirm-form"
+                                          data-type="{{ $product->is_active ? 'warning' : 'success' }}"
+                                          data-title="Ubah Status Produk"
+                                          data-msg="Ubah status <strong>{{ $product->name }}</strong> menjadi <strong>{{ $product->is_active ? 'Nonaktif' : 'Aktif' }}</strong>?">
+                                        @csrf @method('PATCH')
+                                        <button type="button"
+                                                class="btn btn-sm btn-confirm-trigger {{ $product->is_active ? 'btn-success' : 'btn-secondary' }}">
                                             @if($product->is_active)
                                                 <i class="bi bi-eye"></i> Aktif
                                             @else
@@ -255,13 +269,15 @@
                                            class="btn btn-outline-primary" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
+                                        {{-- Hapus: pakai modal konfirmasi --}}
                                         <form method="POST"
                                               action="{{ route('admin.pharmacy.destroy', $product->id) }}"
-                                              onsubmit="return confirm('Yakin hapus produk {{ $product->name }}?')"
-                                              class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-outline-danger" title="Hapus">
+                                              class="d-inline confirm-form"
+                                              data-type="danger"
+                                              data-title="Hapus Produk"
+                                              data-msg="Yakin ingin menghapus produk <strong>{{ $product->name }}</strong>? Tindakan ini tidak dapat dibatalkan.">
+                                            @csrf @method('DELETE')
+                                            <button type="button" class="btn btn-outline-danger btn-confirm-trigger" title="Hapus">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -281,33 +297,120 @@
             </div>
 
             @if($products->hasPages())
-                <div class="p-3 border-top">
+                <div class="p-3 border-top pagination-wrapper">
                     {{ $products->links() }}
                 </div>
             @endif
         </div>
     </div>
-
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{{-- ═══════════════════════════════════════════
+     MODAL KONFIRMASI — reusable
+═══════════════════════════════════════════ --}}
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+    <div class="modal-content" style="border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.18);">
+      <div class="modal-body text-center px-4 pt-4 pb-2">
+        <div id="confirmIconWrap"
+             class="mx-auto mb-3 d-inline-flex align-items-center justify-content-center rounded-circle"
+             style="width:68px;height:68px;font-size:2rem;">
+          <i id="confirmIcon"></i>
+        </div>
+        <h5 class="fw-bold mb-2" id="confirmTitle">Konfirmasi</h5>
+        <p class="mb-0" style="font-size:.92rem;color:#6B5E52;line-height:1.6" id="confirmMsg"></p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pb-4 gap-2">
+        <button type="button" data-bs-dismiss="modal"
+                style="background:#f3f4f6;color:#374151;border:none;padding:10px 28px;border-radius:8px;font-weight:600;">
+          Batal
+        </button>
+        <button type="button" id="confirmOkBtn"
+                style="padding:10px 28px;border-radius:8px;font-weight:600;border:none;">
+          Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<style>
-.stat-card {
-    color: white;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-.stat-card.bg-primary   { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); }
-.stat-card.bg-success   { background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); }
-.stat-card.bg-secondary { background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); }
-.stat-card.bg-info      { background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%); }
-.stat-icon { font-size: 2.5rem; opacity: 0.9; }
-.stat-content h3 { font-size: 2rem; font-weight: 700; margin: 0; }
-.stat-content p  { margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.9; }
-</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmModalEl  = document.getElementById('confirmModal');
+    var confirmOkBtn    = document.getElementById('confirmOkBtn');
+    var confirmIconWrap = document.getElementById('confirmIconWrap');
+    var confirmIcon     = document.getElementById('confirmIcon');
+    var confirmTitle    = document.getElementById('confirmTitle');
+    var confirmMsg      = document.getElementById('confirmMsg');
+    var pendingForm     = null;
+
+    var typeConfig = {
+        danger: {
+            bg       : '#FEE2E2',
+            color    : '#DC2626',
+            iconClass: 'bi bi-trash-fill',
+            btnBg    : '#DC2626',
+            btnColor : '#fff',
+            okLabel  : 'Ya, Hapus',
+        },
+        warning: {
+            bg       : '#FEF9C3',
+            color    : '#CA8A04',
+            iconClass: 'bi bi-exclamation-triangle-fill',
+            btnBg    : '#CA8A04',
+            btnColor : '#fff',
+            okLabel  : 'Ya, Ubah',
+        },
+        success: {
+            bg       : '#DCFCE7',
+            color    : '#16A34A',
+            iconClass: 'bi bi-check-circle-fill',
+            btnBg    : '#16A34A',
+            btnColor : '#fff',
+            okLabel  : 'Ya, Aktifkan',
+        },
+    };
+
+    function getModal() {
+        return bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+    }
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-confirm-trigger');
+        if (!btn) return;
+        var form = btn.closest('.confirm-form');
+        if (!form) return;
+
+        var type = form.dataset.type || 'danger';
+        var cfg  = typeConfig[type]  || typeConfig.danger;
+
+        confirmIconWrap.style.background = cfg.bg;
+        confirmIconWrap.style.color      = cfg.color;
+        confirmIcon.className            = cfg.iconClass;
+        confirmTitle.textContent         = form.dataset.title || 'Konfirmasi';
+        confirmMsg.innerHTML             = form.dataset.msg   || 'Lanjutkan aksi ini?';
+        confirmOkBtn.style.background    = cfg.btnBg;
+        confirmOkBtn.style.color         = cfg.btnColor;
+        confirmOkBtn.textContent         = cfg.okLabel;
+
+        pendingForm = form;
+        getModal().show();
+    });
+
+    confirmOkBtn.addEventListener('click', function () {
+        if (!pendingForm) return;
+        var formToSubmit = pendingForm;
+        pendingForm = null;
+        getModal().hide();
+        confirmModalEl.addEventListener('hidden.bs.modal', function handler() {
+            confirmModalEl.removeEventListener('hidden.bs.modal', handler);
+            formToSubmit.submit();
+        });
+    });
+
+    confirmModalEl.addEventListener('hidden.bs.modal', function () {
+        pendingForm = null;
+    });
+});
+</script>
 @endsection

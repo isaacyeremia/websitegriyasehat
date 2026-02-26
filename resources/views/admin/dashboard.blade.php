@@ -47,20 +47,47 @@
 .table tbody tr { transition: background-color 0.2s; }
 .table tbody tr:hover { background-color: #f8f9fa; }
 
-/* Live indicator */
 .live-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: #28a745;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-    margin-right: 4px;
+    display: inline-block; width: 8px; height: 8px;
+    background: #28a745; border-radius: 50%;
+    animation: pulse 1.5s infinite; margin-right: 4px;
 }
 @keyframes pulse {
     0%   { opacity: 1; transform: scale(1); }
     50%  { opacity: 0.5; transform: scale(1.3); }
     100% { opacity: 1; transform: scale(1); }
 }
+
+/* ── Confirm Modal ── */
+.confirm-modal-content {
+    border: none; border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    overflow: hidden;
+}
+.confirm-icon-wrap {
+    width: 68px; height: 68px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+}
+.confirm-icon-wrap.type-danger  { background: #FEE2E2; color: #DC2626; }
+.confirm-icon-wrap.type-success { background: #DCFCE7; color: #16A34A; }
+.confirm-title { font-size: 1.1rem; font-weight: 700; color: #1C1612; }
+.confirm-msg   { font-size: .92rem; line-height: 1.6; color: #6B5E52; }
+.confirm-btn-cancel {
+    background: #f3f4f6; color: #374151; border: none;
+    padding: 10px 28px; border-radius: 8px; font-weight: 600;
+    transition: background .2s;
+}
+.confirm-btn-cancel:hover { background: #e5e7eb; color: #374151; }
+.confirm-btn-ok {
+    padding: 10px 28px; border-radius: 8px; font-weight: 600; border: none;
+    transition: background .2s, transform .15s;
+}
+.confirm-btn-ok:hover { transform: translateY(-1px); }
+.confirm-btn-ok.btn-danger  { background: #DC2626; color: #fff; }
+.confirm-btn-ok.btn-danger:hover  { background: #B91C1C; }
+.confirm-btn-ok.btn-success { background: #16A34A; color: #fff; }
+.confirm-btn-ok.btn-success:hover { background: #15803D; }
 
 @media (max-width: 768px) {
     .stat-card, .action-card { flex-direction: column; text-align: center; }
@@ -85,55 +112,37 @@
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-primary">
                 <div class="stat-icon"><i class="bi bi-list-ul"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-total">{{ $statistik['total'] }}</h3>
-                    <p>Total Antrian</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-total">{{ $statistik['total'] }}</h3><p>Total Antrian</p></div>
             </div>
         </div>
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-warning">
                 <div class="stat-icon"><i class="bi bi-clock"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-menunggu">{{ $statistik['menunggu'] }}</h3>
-                    <p>Menunggu</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-menunggu">{{ $statistik['menunggu'] }}</h3><p>Menunggu</p></div>
             </div>
         </div>
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-info">
                 <div class="stat-icon"><i class="bi bi-megaphone"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-dipanggil">{{ $statistik['dipanggil'] }}</h3>
-                    <p>Dipanggil</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-dipanggil">{{ $statistik['dipanggil'] }}</h3><p>Dipanggil</p></div>
             </div>
         </div>
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-success">
                 <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-selesai">{{ $statistik['selesai'] }}</h3>
-                    <p>Selesai</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-selesai">{{ $statistik['selesai'] }}</h3><p>Selesai</p></div>
             </div>
         </div>
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-secondary">
                 <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-dibatalkan">{{ $statistik['dibatalkan'] }}</h3>
-                    <p>Dibatalkan</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-dibatalkan">{{ $statistik['dibatalkan'] }}</h3><p>Dibatalkan</p></div>
             </div>
         </div>
         <div class="col-md-2 col-sm-4 col-6">
             <div class="stat-card bg-dark">
                 <div class="stat-icon"><i class="bi bi-people"></i></div>
-                <div class="stat-content">
-                    <h3 id="stat-total-pasien">{{ $statistik['total_pasien'] }}</h3>
-                    <p>Total Pasien</p>
-                </div>
+                <div class="stat-content"><h3 id="stat-total-pasien">{{ $statistik['total_pasien'] }}</h3><p>Total Pasien</p></div>
             </div>
         </div>
     </div>
@@ -192,10 +201,10 @@
                     <label class="form-label small fw-bold"><i class="bi bi-list-check"></i> Status Antrian</label>
                     <select name="status" class="form-select">
                         <option value="">Semua Status</option>
-                        <option value="Menunggu"  {{ request('status') == 'Menunggu'  ? 'selected' : '' }}>⏳ Menunggu</option>
-                        <option value="Dipanggil" {{ request('status') == 'Dipanggil' ? 'selected' : '' }}>📢 Dipanggil</option>
-                        <option value="Selesai"   {{ request('status') == 'Selesai'   ? 'selected' : '' }}>✅ Selesai</option>
-                        <option value="Dibatalkan"{{ request('status') == 'Dibatalkan'? 'selected' : '' }}>❌ Dibatalkan</option>
+                        <option value="Menunggu"   {{ request('status') == 'Menunggu'   ? 'selected' : '' }}>⏳ Menunggu</option>
+                        <option value="Dipanggil"  {{ request('status') == 'Dipanggil'  ? 'selected' : '' }}>📢 Dipanggil</option>
+                        <option value="Selesai"    {{ request('status') == 'Selesai'    ? 'selected' : '' }}>✅ Selesai</option>
+                        <option value="Dibatalkan" {{ request('status') == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -275,25 +284,41 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
+
+                                        {{-- Quick Check-In: pakai modal konfirmasi --}}
                                         @if($antrian->arrival_status == 'Belum Hadir' && $antrian->tanggal == now()->toDateString())
-                                            <form method="POST" action="{{ route('admin.antrian.update', $antrian->id) }}" class="d-inline" title="Quick Check-In">
-                                                @csrf
-                                                @method('PUT')
+                                            <form method="POST" action="{{ route('admin.antrian.update', $antrian->id) }}"
+                                                  class="d-inline confirm-form"
+                                                  data-type="success"
+                                                  data-title="Konfirmasi Kehadiran"
+                                                  data-msg="Pasien <strong>{{ $antrian->patient_name }}</strong> sudah hadir?">
+                                                @csrf @method('PUT')
                                                 <input type="hidden" name="status" value="{{ $antrian->status }}">
                                                 <input type="hidden" name="arrival_status" value="Sudah Hadir">
-                                                <button type="submit" class="btn btn-success" onclick="return confirm('Konfirmasi pasien {{ $antrian->patient_name }} sudah hadir?')">
+                                                <button type="button" class="btn btn-sm btn-success btn-confirm-trigger">
                                                     <i class="bi bi-person-check-fill"></i>
                                                 </button>
                                             </form>
                                         @endif
-                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updateModal{{ $antrian->id }}" title="Update Status">
+
+                                        {{-- Update Status Modal --}}
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal" data-bs-target="#updateModal{{ $antrian->id }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form method="POST" action="{{ route('admin.antrian.delete', $antrian->id) }}" onsubmit="return confirm('Yakin hapus antrian {{ $antrian->kode_antrian }}?')" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+
+                                        {{-- Hapus: pakai modal konfirmasi --}}
+                                        <form method="POST" action="{{ route('admin.antrian.delete', $antrian->id) }}"
+                                              class="d-inline confirm-form"
+                                              data-type="danger"
+                                              data-title="Hapus Antrian"
+                                              data-msg="Yakin ingin menghapus antrian <strong>{{ $antrian->kode_antrian }}</strong>? Tindakan ini tidak dapat dibatalkan.">
+                                            @csrf @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-confirm-trigger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
+
                                     </div>
                                 </td>
                             </tr>
@@ -317,7 +342,9 @@
     </div>
 </div>
 
-{{-- MODALS --}}
+{{-- ═══════════════════════════════════════════
+     MODAL UPDATE STATUS (per antrian)
+═══════════════════════════════════════════ --}}
 @foreach($antrians as $antrian)
 <div class="modal fade" id="updateModal{{ $antrian->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -327,8 +354,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ route('admin.antrian.update', $antrian->id) }}">
-                @csrf
-                @method('PUT')
+                @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="mb-3 pb-3 border-bottom">
                         <div class="row g-2">
@@ -358,10 +384,10 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold"><i class="bi bi-list-check"></i> Status Antrian</label>
                         <select name="status" class="form-select" required>
-                            <option value="Menunggu"  {{ $antrian->status == 'Menunggu'  ? 'selected' : '' }}>⏳ Menunggu</option>
-                            <option value="Dipanggil" {{ $antrian->status == 'Dipanggil' ? 'selected' : '' }}>📢 Dipanggil</option>
-                            <option value="Selesai"   {{ $antrian->status == 'Selesai'   ? 'selected' : '' }}>✅ Selesai</option>
-                            <option value="Dibatalkan"{{ $antrian->status == 'Dibatalkan'? 'selected' : '' }}>❌ Dibatalkan</option>
+                            <option value="Menunggu"   {{ $antrian->status == 'Menunggu'   ? 'selected' : '' }}>⏳ Menunggu</option>
+                            <option value="Dipanggil"  {{ $antrian->status == 'Dipanggil'  ? 'selected' : '' }}>📢 Dipanggil</option>
+                            <option value="Selesai"    {{ $antrian->status == 'Selesai'    ? 'selected' : '' }}>✅ Selesai</option>
+                            <option value="Dibatalkan" {{ $antrian->status == 'Dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
                         </select>
                     </div>
                     <div class="alert alert-warning mb-0 py-2">
@@ -381,23 +407,133 @@
 </div>
 @endforeach
 
+{{-- ═══════════════════════════════════════════
+     MODAL KONFIRMASI — reusable, ganti semua confirm()
+═══════════════════════════════════════════ --}}
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+    <div class="modal-content confirm-modal-content">
+      <div class="modal-body text-center px-4 pt-4 pb-2">
+        <div class="confirm-icon-wrap type-danger" id="confirmIconWrap">
+          <i class="bi bi-exclamation-triangle-fill" id="confirmIcon"></i>
+        </div>
+        <h5 class="confirm-title mt-3 mb-2" id="confirmTitle">Konfirmasi</h5>
+        <p class="confirm-msg mb-0" id="confirmMsg"></p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pb-4 gap-2">
+        <button type="button" class="confirm-btn-cancel" data-bs-dismiss="modal" id="confirmCancelBtn">
+          Batal
+        </button>
+        <button type="button" class="confirm-btn-ok btn-danger" id="confirmOkBtn">
+          Ya, Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-const CSRF_TOKEN = '{{ csrf_token() }}';
+const CSRF_TOKEN    = '{{ csrf_token() }}';
 const LIVE_DATA_URL = '{{ route('admin.live.data') }}';
-const TODAY = '{{ now()->toDateString() }}';
+const TODAY         = '{{ now()->toDateString() }}';
 
 function scrollToAntrian() {
     document.getElementById('daftarAntrian')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// =====================================================
-// MODAL FIX
-// =====================================================
-document.addEventListener('show.bs.modal', function(event) {
+/* ═══════════════════════════════════════════
+   CONFIRM MODAL — menggantikan semua confirm()
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmModalEl  = document.getElementById('confirmModal');
+    var confirmIconWrap = document.getElementById('confirmIconWrap');
+    var confirmIcon     = document.getElementById('confirmIcon');
+    var confirmTitle    = document.getElementById('confirmTitle');
+    var confirmMsg      = document.getElementById('confirmMsg');
+    var confirmOkBtn    = document.getElementById('confirmOkBtn');
+    var pendingForm     = null;
+
+    // Lazy init — buat instance hanya setelah Bootstrap pasti siap
+    var confirmModal = null;
+    function getConfirmModal() {
+        if (!confirmModal) {
+            confirmModal = new bootstrap.Modal(confirmModalEl);
+        }
+        return confirmModal;
+    }
+
+    var typeConfig = {
+        danger: {
+            iconClass : 'bi-trash-fill',
+            wrapClass : 'type-danger',
+            btnClass  : 'btn-danger',
+            okLabel   : 'Ya, Hapus',
+        },
+        success: {
+            iconClass : 'bi-person-check-fill',
+            wrapClass : 'type-success',
+            btnClass  : 'btn-success',
+            okLabel   : 'Ya, Konfirmasi',
+        },
+    };
+
+    // Delegasi klik ke semua .btn-confirm-trigger
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-confirm-trigger');
+        if (!btn) return;
+
+        var form = btn.closest('.confirm-form');
+        if (!form) return;
+
+        var type   = form.dataset.type   || 'danger';
+        var title  = form.dataset.title  || 'Konfirmasi';
+        var msg    = form.dataset.msg    || 'Lanjutkan aksi ini?';
+        var cfg    = typeConfig[type]    || typeConfig.danger;
+
+        confirmIconWrap.className = 'confirm-icon-wrap ' + cfg.wrapClass;
+        confirmIcon.className     = 'bi ' + cfg.iconClass;
+        confirmTitle.textContent  = title;
+        confirmMsg.innerHTML      = msg;
+
+        confirmOkBtn.className  = 'confirm-btn-ok ' + cfg.btnClass;
+        confirmOkBtn.textContent = cfg.okLabel;
+
+        pendingForm = form;
+        getConfirmModal().show();
+    });
+
+    // Klik "Ya, Lanjutkan" → submit form aslinya
+    confirmOkBtn.addEventListener('click', function () {
+        if (!pendingForm) return;
+
+        // Simpan referensi lokal sebelum hide() memicu hidden.bs.modal
+        var formToSubmit = pendingForm;
+        pendingForm = null; // reset lebih awal agar listener reset di bawah tidak ganggu
+
+        getConfirmModal().hide();
+
+        // Tunggu modal benar-benar tertutup baru submit
+        confirmModalEl.addEventListener('hidden.bs.modal', function handler() {
+            confirmModalEl.removeEventListener('hidden.bs.modal', handler);
+            formToSubmit.submit();
+        });
+    });
+
+    // Reset saat modal ditutup via Batal/X (bukan via OK)
+    confirmModalEl.addEventListener('hidden.bs.modal', function () {
+        pendingForm = null;
+    });
+});
+
+/* ═══════════════════════════════════════════
+   UPDATE MODAL FIX
+═══════════════════════════════════════════ */
+document.addEventListener('show.bs.modal', function (event) {
     const modal = event.target;
+    if (modal.id === 'confirmModal') return; // jangan override confirm modal
     document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
     setTimeout(() => {
-        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.65)';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.65)';
         modal.style.display = 'flex';
         modal.style.alignItems = 'center';
         modal.style.justifyContent = 'center';
@@ -405,63 +541,68 @@ document.addEventListener('show.bs.modal', function(event) {
     }, 10);
 });
 
-document.addEventListener('hidden.bs.modal', function(event) {
+document.addEventListener('hidden.bs.modal', function (event) {
     const modal = event.target;
+    if (modal.id === 'confirmModal') return;
     modal.style.backgroundColor = '';
     document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
-    // Refresh data setelah modal tutup (status mungkin berubah)
     fetchLiveData();
 });
 
-// =====================================================
-// LIVE REFRESH - AJAX POLLING SETIAP 5 DETIK
-// =====================================================
-let isModalOpen = false;
+/* ═══════════════════════════════════════════
+   LIVE REFRESH — AJAX polling setiap 5 detik
+═══════════════════════════════════════════ */
+let isModalOpen  = false;
 let refreshTimer = null;
 
 document.addEventListener('show.bs.modal',   () => { isModalOpen = true;  });
 document.addEventListener('hidden.bs.modal', () => { isModalOpen = false; });
 
 function statusBadgeClass(status) {
-    return {
-        'Menunggu':  'bg-warning text-dark',
-        'Dipanggil': 'bg-info',
-        'Selesai':   'bg-success',
-        'Dibatalkan':'bg-secondary',
-    }[status] || 'bg-secondary';
+    return { 'Menunggu':'bg-warning text-dark','Dipanggil':'bg-info','Selesai':'bg-success','Dibatalkan':'bg-secondary' }[status] || 'bg-secondary';
 }
-
 function arrivalBadgeClass(arrival) {
-    return {
-        'Belum Hadir': 'bg-secondary',
-        'Sudah Hadir': 'bg-success',
-        'Tidak Hadir': 'bg-danger',
-    }[arrival] || 'bg-secondary';
+    return { 'Belum Hadir':'bg-secondary','Sudah Hadir':'bg-success','Tidak Hadir':'bg-danger' }[arrival] || 'bg-secondary';
 }
 
 function renderRow(a, nomor) {
     const jamHtml = a.appointment_time
         ? `<i class="bi bi-clock"></i> ${a.appointment_time}`
         : '<span class="text-muted">-</span>';
-
     const confirmedHtml = a.confirmed_at
-        ? `<br><small class="text-muted">${a.confirmed_at} WIB</small>`
-        : '';
+        ? `<br><small class="text-muted">${a.confirmed_at} WIB</small>` : '';
 
+    // Check-in button — modal konfirmasi via data attributes
     const checkinBtn = (a.arrival_status === 'Belum Hadir' && a.tanggal_raw === TODAY)
-        ? `<form method="POST" action="/admin/antrian/${a.id}/status" class="d-inline">
+        ? `<form method="POST" action="/admin/antrian/${a.id}/status"
+               class="d-inline confirm-form"
+               data-type="success"
+               data-title="Konfirmasi Kehadiran"
+               data-msg="Pasien <strong>${a.patient_name.replace(/</g,'&lt;')}</strong> sudah hadir?">
                <input type="hidden" name="_token" value="${CSRF_TOKEN}">
                <input type="hidden" name="_method" value="PUT">
                <input type="hidden" name="status" value="${a.status}">
                <input type="hidden" name="arrival_status" value="Sudah Hadir">
-               <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Konfirmasi pasien ${a.patient_name.replace(/'/g,"\\'")} sudah hadir?')">
+               <button type="button" class="btn btn-sm btn-success btn-confirm-trigger">
                    <i class="bi bi-person-check-fill"></i>
                </button>
-           </form>`
-        : '';
+           </form>` : '';
+
+    // Delete button — modal konfirmasi via data attributes
+    const deleteBtn = `<form method="POST" action="/admin/antrian/${a.id}"
+           class="d-inline confirm-form"
+           data-type="danger"
+           data-title="Hapus Antrian"
+           data-msg="Yakin ingin menghapus antrian <strong>${a.kode_antrian}</strong>? Tindakan ini tidak dapat dibatalkan.">
+           <input type="hidden" name="_token" value="${CSRF_TOKEN}">
+           <input type="hidden" name="_method" value="DELETE">
+           <button type="button" class="btn btn-sm btn-outline-danger btn-confirm-trigger">
+               <i class="bi bi-trash"></i>
+           </button>
+       </form>`;
 
     return `<tr>
         <td class="px-3">${nomor}</td>
@@ -474,23 +615,15 @@ function renderRow(a, nomor) {
         <td>${jamHtml}</td>
         <td>${a.keluhan}</td>
         <td><span class="badge ${statusBadgeClass(a.status)}">${a.status}</span></td>
-        <td>
-            <span class="badge ${arrivalBadgeClass(a.arrival_status)}">${a.arrival_status}</span>
-            ${confirmedHtml}
-        </td>
+        <td><span class="badge ${arrivalBadgeClass(a.arrival_status)}">${a.arrival_status}</span>${confirmedHtml}</td>
         <td class="text-center">
             <div class="btn-group btn-group-sm">
                 ${checkinBtn}
-                <button type="button" class="btn btn-outline-primary"
+                <button type="button" class="btn btn-sm btn-outline-primary"
                     data-bs-toggle="modal" data-bs-target="#updateModal${a.id}">
                     <i class="bi bi-pencil-square"></i>
                 </button>
-                <form method="POST" action="/admin/antrian/${a.id}" class="d-inline"
-                      onsubmit="return confirm('Yakin hapus antrian ${a.kode_antrian}?')">
-                    <input type="hidden" name="_token" value="${CSRF_TOKEN}">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                </form>
+                ${deleteBtn}
             </div>
         </td>
     </tr>`;
@@ -498,15 +631,12 @@ function renderRow(a, nomor) {
 
 function fetchLiveData() {
     if (isModalOpen) return;
-
     const params = new URLSearchParams(window.location.search);
-
     fetch(`${LIVE_DATA_URL}?${params.toString()}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(r => r.json())
     .then(json => {
-        // Update stat cards
         const statMap = {
             'stat-total':        json.statistik.total,
             'stat-menunggu':     json.statistik.menunggu,
@@ -520,13 +650,10 @@ function fetchLiveData() {
             if (el && el.textContent != val) el.textContent = val;
         });
 
-        // Update tbody
         const tbody = document.getElementById('antrian-tbody');
         if (!tbody) return;
-
-        const rows = json.antrians.data;
+        const rows   = json.antrians.data;
         const offset = json.antrians.from ? json.antrians.from - 1 : 0;
-
         if (!rows || rows.length === 0) {
             tbody.innerHTML = `<tr><td colspan="12" class="text-center text-muted py-5">
                 <i class="bi bi-inbox fs-1 d-block mb-2"></i><p>Belum ada antrian</p>
@@ -535,17 +662,15 @@ function fetchLiveData() {
             tbody.innerHTML = rows.map((a, i) => renderRow(a, offset + i + 1)).join('');
         }
 
-        // Update timestamp
         const now = new Date();
-        const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
-            .map(n => String(n).padStart(2, '0')).join(':');
+        const ts  = [now.getHours(), now.getMinutes(), now.getSeconds()]
+            .map(n => String(n).padStart(2,'0')).join(':');
         const el = document.getElementById('last-refresh');
         if (el) el.textContent = ts;
     })
     .catch(err => console.warn('Live refresh error:', err));
 }
 
-// Mulai polling setiap 5 detik
 refreshTimer = setInterval(fetchLiveData, 5000);
 window.addEventListener('beforeunload', () => clearInterval(refreshTimer));
 </script>
