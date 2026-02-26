@@ -43,171 +43,280 @@
   </div>
 </section>
 
-<!-- LAYANAN KAMI (CAROUSEL SLIDER) -->
-<section class="section bg-light">
+{{-- ============================================================ --}}
+{{-- LAYANAN KAMI - 3 cards visible, center = active, pure JS    --}}
+{{-- ============================================================ --}}
+<section class="layanan-section">
   <div class="container">
     <h2 class="text-center fw-bold mb-1">Layanan Kami</h2>
-    <p class="text-center text-muted mb-5">Berbagai Metode Pengobatan Tradisional & Modern</p>
+    <p class="text-center text-muted mb-5">Berbagai Metode Pengobatan Tradisional &amp; Modern</p>
 
-    <div id="layananCarousel" class="carousel slide" data-bs-ride="carousel">
-      
-      <!-- Indicators -->
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="2"></button>
-        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="3"></button>
-        <button type="button" data-bs-target="#layananCarousel" data-bs-slide-to="4"></button>
-      </div>
+    @php
+      $layanan = [
+        ['img'=>'akupuntur.jpg',        'judul'=>'Akupuntur',         'desc'=>'Terapi tusuk jarum tradisional Tiongkok untuk menyeimbangkan energi tubuh, mengatasi nyeri, stres, dan berbagai keluhan kesehatan lainnya.',          'tags'=>[['label'=>'Nyeri Sendi','c'=>'blue'],['label'=>'Migrain','c'=>'blue'],['label'=>'Stres','c'=>'blue']]],
+        ['img'=>'pengobatan_herbal.jpg', 'judul'=>'Pengobatan Herbal', 'desc'=>'Ramuan herbal tradisional dari bahan-bahan alami pilihan untuk meningkatkan daya tahan tubuh dan mengatasi berbagai penyakit secara alami.',          'tags'=>[['label'=>'Alami','c'=>'green'],['label'=>'Aman','c'=>'green'],['label'=>'Berkhasiat','c'=>'green']]],
+        ['img'=>'bekam.jpg',             'judul'=>'Bekam / Kop',       'desc'=>'Terapi bekam basah dan kering untuk mengeluarkan racun, melancarkan peredaran darah, dan meningkatkan sistem kekebalan tubuh.',                       'tags'=>[['label'=>'Detoksifikasi','c'=>'red'],['label'=>'Sirkulasi Darah','c'=>'red'],['label'=>'Imunitas','c'=>'red']]],
+        ['img'=>'kerokan.jpg',           'judul'=>'Kerokan / Gua Sha', 'desc'=>'Teknik kerokan tradisional dengan alat khusus untuk mengeluarkan angin, mengurangi demam, masuk angin, dan melancarkan peredaran darah.',             'tags'=>[['label'=>'Masuk Angin','c'=>'yellow'],['label'=>'Pegal Linu','c'=>'yellow'],['label'=>'Demam','c'=>'yellow']]],
+        ['img'=>'pijat_tuina.jpg',       'judul'=>'Pijat Tuina',       'desc'=>'Pijat terapi tradisional Tiongkok dengan teknik khusus untuk relaksasi otot, mengatasi nyeri, dan meningkatkan kesehatan secara menyeluruh.',          'tags'=>[['label'=>'Relaksasi','c'=>'teal'],['label'=>'Nyeri Otot','c'=>'teal'],['label'=>'Kesehatan','c'=>'teal']]],
+      ];
+    @endphp
 
-      <!-- Slides -->
-      <div class="carousel-inner">
-        
-        <!-- Slide 1: Akupuntur -->
-        <div class="carousel-item active">
-          <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-              <div class="card border-0 shadow-lg">
-                <img src="{{ asset('images/layanan/akupuntur.jpg') }}" 
-                     class="card-img-top" 
-                     alt="Akupuntur"
-                     style="height: 400px; object-fit: cover;">
-                <div class="card-body text-center p-4">
-                  <h4 class="fw-bold mb-3">Akupuntur</h4>
-                  <p class="text-muted">
-                    Terapi tusuk jarum tradisional Tiongkok untuk menyeimbangkan energi tubuh, 
-                    mengatasi nyeri, stres, dan berbagai keluhan kesehatan lainnya.
-                  </p>
-                  <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-primary">Nyeri Sendi</span>
-                    <span class="badge bg-primary">Migrain</span>
-                    <span class="badge bg-primary">Stres</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    {{-- Data cards sebagai JSON untuk JS --}}
+    <div id="layananData" style="display:none" data-cards='@json($layanan)'></div>
 
-        <!-- Slide 2: Pengobatan Herbal -->
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-              <div class="card border-0 shadow-lg">
-                <img src="{{ asset('images/layanan/pengobatan_herbal.jpg') }}" 
-                     class="card-img-top" 
-                     alt="Pengobatan Herbal"
-                     style="height: 400px; object-fit: cover;">
-                <div class="card-body text-center p-4">
-                  <h4 class="fw-bold mb-3">Pengobatan Herbal</h4>
-                  <p class="text-muted">
-                    Ramuan herbal tradisional dari bahan-bahan alami pilihan untuk 
-                    meningkatkan daya tahan tubuh dan mengatasi berbagai penyakit secara alami.
-                  </p>
-                  <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-success">Alami</span>
-                    <span class="badge bg-success">Aman</span>
-                    <span class="badge bg-success">Berkhasiat</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 3: Bekam/Kop -->
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-              <div class="card border-0 shadow-lg">
-                <img src="{{ asset('images/layanan/bekam.jpg') }}" 
-                     class="card-img-top" 
-                     alt="Bekam"
-                     style="height: 400px; object-fit: cover;">
-                <div class="card-body text-center p-4">
-                  <h4 class="fw-bold mb-3">Bekam / Kop</h4>
-                  <p class="text-muted">
-                    Terapi bekam basah dan kering untuk mengeluarkan racun, melancarkan peredaran darah, 
-                    dan meningkatkan sistem kekebalan tubuh.
-                  </p>
-                  <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-danger">Detoksifikasi</span>
-                    <span class="badge bg-danger">Sirkulasi Darah</span>
-                    <span class="badge bg-danger">Imunitas</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 4: Kerokan -->
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-              <div class="card border-0 shadow-lg">
-                <img src="{{ asset('images/layanan/kerokan.jpg') }}" 
-                     class="card-img-top" 
-                     alt="Kerokan"
-                     style="height: 400px; object-fit: cover;">
-                <div class="card-body text-center p-4">
-                  <h4 class="fw-bold mb-3">Kerokan / Gua Sha</h4>
-                  <p class="text-muted">
-                    Teknik kerokan tradisional dengan alat khusus untuk mengeluarkan angin, 
-                    mengurangi demam, masuk angin, dan melancarkan peredaran darah.
-                  </p>
-                  <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-warning text-dark">Masuk Angin</span>
-                    <span class="badge bg-warning text-dark">Pegal Linu</span>
-                    <span class="badge bg-warning text-dark">Demam</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 5: Pijat Tuina -->
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-              <div class="card border-0 shadow-lg">
-                <img src="{{ asset('images/layanan/pijat_tuina.jpg') }}" 
-                     class="card-img-top" 
-                     alt="Pijat Tuina"
-                     style="height: 400px; object-fit: cover;">
-                <div class="card-body text-center p-4">
-                  <h4 class="fw-bold mb-3">Pijat Tuina</h4>
-                  <p class="text-muted">
-                    Pijat terapi tradisional Tiongkok dengan teknik khusus untuk relaksasi otot, 
-                    mengatasi nyeri, dan meningkatkan kesehatan secara menyeluruh.
-                  </p>
-                  <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-info">Relaksasi</span>
-                    <span class="badge bg-info">Nyeri Otot</span>
-                    <span class="badge bg-info">Kesehatan</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Controls -->
-      <button class="carousel-control-prev" type="button" data-bs-target="#layananCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
+    {{-- Carousel UI --}}
+    <div class="lc-outer">
+      <button class="lc-btn lc-btn-prev" id="lcPrev">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#layananCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
+
+      <div class="lc-viewport">
+        {{-- 3 card slots: prev | active | next --}}
+        <div class="lc-slot lc-slot-prev"  id="lcSlotPrev"></div>
+        <div class="lc-slot lc-slot-active" id="lcSlotActive"></div>
+        <div class="lc-slot lc-slot-next"  id="lcSlotNext"></div>
+      </div>
+
+      <button class="lc-btn lc-btn-next" id="lcNext">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
 
+    {{-- Dots --}}
+    <div class="lc-dots" id="lcDots">
+      @foreach($layanan as $i => $l)
+        <button class="lc-dot {{ $i===0?'active':'' }}" data-i="{{ $i }}"></button>
+      @endforeach
+    </div>
   </div>
 </section>
+
+<style>
+.layanan-section { padding: 56px 0 48px; background: #fff; }
+
+/* Outer — full container width, relative for absolute arrows */
+.lc-outer {
+  position: relative;
+  width: 100%;
+}
+
+/* Viewport — 3-column, clips overflow */
+.lc-viewport {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  overflow: hidden;
+  padding: 8px 80px;
+}
+
+/* Slots */
+.lc-slot { overflow: hidden; position: relative; min-height: 260px; }
+.lc-slot-prev, .lc-slot-next {
+  opacity: 0.4;
+  filter: blur(1px);
+  pointer-events: none;
+}
+/* Clip side slots to show only ~half the card */
+.lc-slot-prev { clip-path: inset(0 0 0 50%); }   /* show right half only */
+.lc-slot-next { clip-path: inset(0 50% 0 0); }   /* show left half only */
+.lc-slot-prev .lc-body,
+.lc-slot-next .lc-body { display: none; }
+.lc-slot-prev .lc-img,
+.lc-slot-next .lc-img  { height: 260px; border-radius: 16px; overflow: hidden; }
+.lc-slot-active { opacity: 1; filter: none; }
+
+/* Card */
+.lc-card {
+  background: #fff; border-radius: 16px; overflow: hidden;
+  border: 1.5px solid #e8edf5;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  display: flex; flex-direction: column;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.lc-slot-active .lc-card {
+  border-color: #c7d9ff;
+  box-shadow: 0 12px 40px rgba(13,110,253,0.16);
+}
+
+/* Image */
+.lc-img { height: 240px; overflow: hidden; flex-shrink: 0; }
+.lc-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.5s ease;
+}
+.lc-slot-active .lc-card:hover .lc-img img { transform: scale(1.04); }
+
+/* Body */
+.lc-body { padding: 18px 20px 22px; flex: 1; }
+.lc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.lc-tag { font-size: 0.7rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; }
+.lc-tag-blue   { background:#dbeafe; color:#1d4ed8; }
+.lc-tag-green  { background:#dcfce7; color:#15803d; }
+.lc-tag-red    { background:#fee2e2; color:#b91c1c; }
+.lc-tag-yellow { background:#fef9c3; color:#a16207; }
+.lc-tag-teal   { background:#ccfbf1; color:#0f766e; }
+.lc-title { font-size: 1.05rem; font-weight: 700; color: #1a1a2e; margin: 0 0 8px; }
+.lc-desc  { color: #6c757d; font-size: 0.84rem; line-height: 1.65; margin: 0; }
+
+/* Arrow buttons — on top of side cards */
+.lc-btn {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  z-index: 10;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: none; background: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #333;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.lc-btn:hover { background: #0d6efd; color: #fff; transform: translateY(-50%) scale(1.08); }
+.lc-btn:disabled { opacity: 0.25; pointer-events: none; }
+.lc-btn svg { width: 20px; height: 20px; }
+/* Position arrows centered over the side card peek area */
+.lc-btn-prev { left: calc(80px + (100% - 160px) / 6 - 22px); }
+.lc-btn-next { right: calc(80px + (100% - 160px) / 6 - 22px); }
+
+/* Dots */
+.lc-dots { display: flex; justify-content: center; gap: 7px; margin-top: 20px; }
+.lc-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  border: none; background: #c5cfe8; cursor: pointer; padding: 0;
+  transition: background 0.25s, width 0.25s, border-radius 0.25s;
+}
+.lc-dot.active { background: #0d6efd; width: 22px; border-radius: 4px; }
+
+/* Slide animation */
+@keyframes lcFromRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
+@keyframes lcFromLeft  { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:none; } }
+.lc-viewport.dir-next .lc-card { animation: lcFromRight 0.38s cubic-bezier(.25,.8,.25,1) both; }
+.lc-viewport.dir-prev .lc-card { animation: lcFromLeft  0.38s cubic-bezier(.25,.8,.25,1) both; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lc-viewport { padding: 8px 48px; grid-template-columns: 1fr 3fr 1fr; gap: 12px; }
+  .lc-img, .lc-slot-prev .lc-img, .lc-slot-next .lc-img { height: 180px; }
+  .lc-btn-prev { left: 4px; }
+  .lc-btn-next { right: 4px; }
+}
+</style>
+
+<script>
+(function () {
+  const raw    = document.getElementById('layananData').dataset.cards;
+  const cards  = JSON.parse(raw);
+  const TOTAL  = cards.length;
+  const AUTO   = 4000;
+  let cur      = 0;
+  let timer    = null;
+
+  const slotPrev   = document.getElementById('lcSlotPrev');
+  const slotActive = document.getElementById('lcSlotActive');
+  const slotNext   = document.getElementById('lcSlotNext');
+  const btnPrev    = document.getElementById('lcPrev');
+  const btnNext    = document.getElementById('lcNext');
+  const dots       = Array.from(document.querySelectorAll('#lcDots .lc-dot'));
+
+  /* Build tag color map */
+  const tagColorMap = { blue:'blue', green:'green', red:'red', yellow:'yellow', teal:'teal' };
+
+  /* Render a card into a slot element */
+  function renderCard(slot, idx) {
+    const d = cards[((idx % TOTAL) + TOTAL) % TOTAL];
+    const tagsHtml = d.tags.map(t =>
+      `<span class="lc-tag lc-tag-${t.c}">${t.label}</span>`
+    ).join('');
+
+    slot.innerHTML = `
+      <div class="lc-card">
+        <div class="lc-img">
+          <img src="/images/layanan/${d.img}" alt="${d.judul}" loading="lazy">
+        </div>
+        <div class="lc-body">
+          <div class="lc-tags">${tagsHtml}</div>
+          <h3 class="lc-title">${d.judul}</h3>
+          <p class="lc-desc">${d.desc}</p>
+        </div>
+      </div>`;
+  }
+
+  /* Render all 3 slots based on current index */
+  function render() {
+    renderCard(slotPrev,   cur - 1);
+    renderCard(slotActive, cur);
+    renderCard(slotNext,   cur + 1);
+
+    /* Dots */
+    dots.forEach((d, i) => d.classList.toggle('active', i === cur));
+  }
+
+  const viewport = document.querySelector('.lc-viewport');
+  let animating  = false;
+
+  function goTo(idx) {
+    if (animating) return;
+    animating = true;
+
+    const next = ((idx % TOTAL) + TOTAL) % TOTAL;
+    const dir  = idx >= cur ? 'dir-next' : 'dir-prev';   /* direction feel */
+
+    /* Remove old direction class, set new content, add direction class */
+    viewport.classList.remove('dir-next', 'dir-prev');
+    cur = next;
+    render();
+    /* Force reflow so animation re-triggers */
+    viewport.offsetWidth;
+    viewport.classList.add(dir);
+
+    /* Unlock after animation */
+    setTimeout(() => { animating = false; }, 400);
+  }
+
+  /* Auto-play */
+  function startAuto() {
+    clearInterval(timer);
+    timer = setInterval(() => goTo(cur + 1), AUTO);
+  }
+  function stopAuto() { clearInterval(timer); }
+
+  btnPrev.addEventListener('click', () => { goTo(cur - 1); startAuto(); });
+  btnNext.addEventListener('click', () => { goTo(cur + 1); startAuto(); });
+  dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); startAuto(); }));
+
+  /* Pause on hover */
+  viewport.addEventListener('mouseenter', stopAuto);
+  viewport.addEventListener('mouseleave', startAuto);
+
+  /* Touch swipe */
+  let tx = 0;
+  slotActive.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  slotActive.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) { goTo(cur + (dx < 0 ? 1 : -1)); startAuto(); }
+  });
+
+  /* Init */
+  render();
+  startAuto();
+
+  /* Position arrows centered over side slots after layout */
+  function positionArrows() {
+    const slotPrevEl = document.getElementById('lcSlotPrev');
+    const slotNextEl = document.getElementById('lcSlotNext');
+    const outerEl    = document.querySelector('.lc-outer');
+    const outerRect  = outerEl.getBoundingClientRect();
+    const prevRect   = slotPrevEl.getBoundingClientRect();
+    const nextRect   = slotNextEl.getBoundingClientRect();
+
+    btnPrev.style.left  = (prevRect.left  - outerRect.left + prevRect.width  / 2 - 22) + 'px';
+    btnNext.style.right = (outerRect.right - nextRect.right + nextRect.width / 2 - 22) + 'px';
+    btnNext.style.left  = '';
+  }
+
+  requestAnimationFrame(positionArrows);
+  window.addEventListener('resize', positionArrows);
+})();
+</script>
 
 {{-- TENAGA MEDIS --}}
 <section class="section">
@@ -287,32 +396,6 @@
 
 <!-- Custom CSS -->
 <style>
-  /* Carousel Controls */
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 5%;
-  }
-
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    padding: 20px;
-  }
-
-  .carousel-indicators button {
-    background-color: #6c757d;
-  }
-
-  .carousel-indicators button.active {
-    background-color: #0d6efd;
-  }
-
-  .carousel-item {
-    padding: 20px 0;
-    min-height: 600px;
-  }
-
   /* Doctor Card Hover Effect */
   .hover-card {
     transition: all 0.3s ease;

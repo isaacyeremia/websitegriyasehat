@@ -54,14 +54,16 @@ class AntrianController extends Controller
         $service     = Service::where('name', $validated['poli'])->first();
         $durasiMenit = $service ? $service->duration_minutes : 20;
 
+        // =====================================================
         // VALIDASI 1: Jeda antar booking berdasarkan durasi layanan
+        // =====================================================
         $jamBooking = Carbon::createFromFormat('H:i', $validated['appointment_time']);
         $jamMin     = $jamBooking->copy()->subMinutes($durasiMenit)->format('H:i:s');
         $jamMax     = $jamBooking->copy()->addMinutes($durasiMenit)->format('H:i:s');
 
         $bentrokJeda = PatientHistory::where('tanggal', $validated['tanggal'])
             ->where('dokter', $validated['dokter'])
-            ->whereNotIn('status', ['Dibatalkan'])
+            ->whereNotIn('status', ['Dibatalkan', 'Selesai', 'Tidak Hadir'])
             ->whereRaw("appointment_time > ? AND appointment_time < ?", [$jamMin, $jamMax])
             ->exists();
 
@@ -72,58 +74,64 @@ class AntrianController extends Controller
             ])->withInput();
         }
 
-        // VALIDASI 2: Duplikat booking (user + dokter + poli + tanggal sama)
-        $bookingDuplikat = PatientHistory::where('user_id', Auth::id())
+        // =====================================================
+        // VALIDASI 2: User tidak boleh booking poli yang sama
+        // di hari yang sama (beda terapis / jam sekalipun)
+        // =====================================================
+        $bookingPoliSama = PatientHistory::where('user_id', Auth::id())
             ->where('tanggal', $validated['tanggal'])
-            ->where('dokter', $validated['dokter'])
             ->where('poli', $validated['poli'])
-            ->whereNotIn('status', ['Dibatalkan'])
-            ->exists();
+            ->whereNotIn('status', ['Dibatalkan', 'Selesai', 'Tidak Hadir'])
+            ->first();
 
-        if ($bookingDuplikat) {
+        if ($bookingPoliSama) {
             return back()->withErrors([
-                'poli' => 'Anda sudah punya booking dengan terapis dan layanan yang sama di tanggal ini.'
+                'poli' => 'Anda sudah punya booking layanan "' . $validated['poli'] .
+                    '" di tanggal ini dengan ' . $bookingPoliSama->dokter .
+                    ' jam ' . Carbon::parse($bookingPoliSama->appointment_time)->format('H:i') .
+                    '. Tidak bisa booking layanan yang sama 2x dalam sehari.'
             ])->withInput();
         }
 
-        $bookingUserJamLain = PatientHistory::where('user_id', Auth::id())
+        // =====================================================
+        // VALIDASI 3: User tidak boleh booking di jam yang
+        // overlap dengan booking lain (lintas terapis)
+        // =====================================================
+        $bookingUserHariIni = PatientHistory::where('user_id', Auth::id())
             ->where('tanggal', $validated['tanggal'])
-            ->where('dokter', '!=', $validated['dokter']) // dokter LAIN
-            ->whereNotIn('status', ['Dibatalkan'])
+            ->where('dokter', '!=', $validated['dokter'])
+            ->whereNotIn('status', ['Dibatalkan', 'Selesai', 'Tidak Hadir'])
             ->get();
 
-        foreach ($bookingUserJamLain as $existingBooking) {
-            // Ambil durasi layanan booking yang sudah ada
-            $existingService  = \App\Models\Service::where('name', $existingBooking->poli)->first();
-            $existingDurasi   = $existingService ? $existingService->duration_minutes : 20;
+        $newJamMulai   = Carbon::createFromFormat('H:i', $validated['appointment_time']);
+        $newJamSelesai = $newJamMulai->copy()->addMinutes($durasiMenit);
 
-            $existingJam      = \Carbon\Carbon::parse($existingBooking->appointment_time);
-            $existingJamMulai = $existingJam->copy()->format('H:i:s');
-            $existingJamSelesai = $existingJam->copy()->addMinutes($existingDurasi)->format('H:i:s');
+        foreach ($bookingUserHariIni as $existingBooking) {
+            $existingService = Service::where('name', $existingBooking->poli)->first();
+            $existingDurasi  = $existingService ? $existingService->duration_minutes : 20;
+            $existingMulai   = Carbon::parse($existingBooking->appointment_time);
+            $existingSelesai = $existingMulai->copy()->addMinutes($existingDurasi);
 
-            // Durasi layanan baru
-            $newJam      = \Carbon\Carbon::createFromFormat('H:i', $validated['appointment_time']);
-            $newJamMulai = $newJam->copy()->format('H:i:s');
-            $newJamSelesai = $newJam->copy()->addMinutes($durasiMenit)->format('H:i:s');
-
-            // Cek apakah range waktu overlap
-            $overlap = $newJamMulai < $existingJamSelesai && $newJamSelesai > $existingJamMulai;
+            $overlap = $newJamMulai->lt($existingSelesai) && $newJamSelesai->gt($existingMulai);
 
             if ($overlap) {
                 return back()->withErrors([
-                    'appointment_time' => 'Anda sudah punya booking dengan ' . $existingBooking->dokter .
-                        ' di jam ' . \Carbon\Carbon::parse($existingBooking->appointment_time)->format('H:i') .
-                        ' (' . $existingBooking->poli . ', ' . $existingDurasi . ' menit). ' .
-                        'Waktu tersebut bertabrakan dengan booking ini.'
+                    'appointment_time' => 'Jadwal bertabrakan! Anda sudah booking dengan ' .
+                        $existingBooking->dokter .
+                        ' jam ' . $existingMulai->format('H:i') .
+                        ' s/d ' . $existingSelesai->format('H:i') .
+                        ' (' . $existingBooking->poli . ').'
                 ])->withInput();
             }
         }
 
-        // VALIDASI 3: Slot waktu persis sudah dibooking
+        // =====================================================
+        // VALIDASI 4: Slot waktu persis sudah dibooking orang lain
+        // =====================================================
         $existingSlotBooking = PatientHistory::where('tanggal', $validated['tanggal'])
             ->where('appointment_time', $validated['appointment_time'])
             ->where('dokter', $validated['dokter'])
-            ->whereIn('status', ['Menunggu', 'Dipanggil', 'Selesai'])
+            ->whereNotIn('status', ['Dibatalkan', 'Selesai', 'Tidak Hadir'])
             ->exists();
 
         if ($existingSlotBooking) {
@@ -134,7 +142,9 @@ class AntrianController extends Controller
             ])->withInput();
         }
 
-        // VALIDASI 4: Kuota dokter
+        // =====================================================
+        // VALIDASI 5: Kuota dokter
+        // =====================================================
         $doctor = Doctor::where('name', $validated['dokter'])->first();
         if (!$doctor) {
             return back()->withErrors(['dokter' => 'Dokter tidak ditemukan'])->withInput();
@@ -154,7 +164,7 @@ class AntrianController extends Controller
 
         $bookedCount = PatientHistory::where('dokter', $validated['dokter'])
             ->where('tanggal', $validated['tanggal'])
-            ->whereIn('status', ['Menunggu', 'Dipanggil', 'Selesai'])
+            ->whereNotIn('status', ['Dibatalkan', 'Tidak Hadir'])
             ->count();
 
         if ($bookedCount >= $schedule->quota) {
@@ -163,9 +173,10 @@ class AntrianController extends Controller
             ])->withInput();
         }
 
+        // =====================================================
         // SIMPAN dengan kode sementara
-        $user   = Auth::user();
-        $prefix = 'GS-' . Carbon::parse($validated['tanggal'])->format('dmy');
+        // =====================================================
+        $user = Auth::user();
 
         $history = PatientHistory::create([
             'user_id'          => $user->id,
@@ -183,24 +194,34 @@ class AntrianController extends Controller
             'arrival_status'   => 'Belum Hadir',
         ]);
 
-        // RE-ASSIGN kode antrian berdasarkan urutan appointment_time
-        $semuaBooking = PatientHistory::where('tanggal', $validated['tanggal'])
-            ->where('dokter', $validated['dokter'])
-            ->whereNotIn('status', ['Dibatalkan'])
-            ->orderBy('appointment_time', 'asc')
-            ->get();
-        
-        foreach ($semuaBooking as $i => $booking) {
-            $booking->update([
-                'kode_antrian' => 'A' . str_pad($i + 1, 3, '0', STR_PAD_LEFT)
-            ]);
-        }
+        // RE-ASSIGN kode antrian A001, A002, dst. berdasarkan urutan jam
+        self::reassignQueueCodes($validated['tanggal'], $validated['dokter']);
 
         $history->refresh();
 
         return redirect()->route('booking.index')
             ->with('success', 'Booking berhasil! Kode antrian: ' . $history->kode_antrian .
                 ' | Layanan: ' . $validated['poli'] . ' (' . $durasiMenit . ' menit)');
+    }
+
+    /**
+     * Re-assign kode antrian berdasarkan urutan appointment_time (ASC).
+     * Public static agar bisa dipanggil dari AdminController.
+     * Status Dibatalkan dan Tidak Hadir dikecualikan dari penomoran.
+     */
+    public static function reassignQueueCodes(string $tanggal, string $dokter): void
+    {
+        $semuaBooking = PatientHistory::where('tanggal', $tanggal)
+            ->where('dokter', $dokter)
+            ->whereNotIn('status', ['Dibatalkan', 'Tidak Hadir'])
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        foreach ($semuaBooking as $i => $booking) {
+            $booking->update([
+                'kode_antrian' => 'A' . str_pad($i + 1, 3, '0', STR_PAD_LEFT)
+            ]);
+        }
     }
 
     public function cek(Request $request)
@@ -236,7 +257,7 @@ class AntrianController extends Controller
 
                 $bookedCount = PatientHistory::where('dokter', $schedule->doctor->name)
                     ->where('tanggal', $date)
-                    ->whereIn('status', ['Menunggu', 'Dipanggil', 'Selesai'])
+                    ->whereNotIn('status', ['Dibatalkan', 'Tidak Hadir'])
                     ->count();
 
                 $quotaLeft = $schedule->quota - $bookedCount;
@@ -275,7 +296,7 @@ class AntrianController extends Controller
                 $schedule    = $practiceDays[$dayName];
                 $bookedCount = PatientHistory::where('dokter', $doctor->name)
                     ->where('tanggal', $date->toDateString())
-                    ->whereIn('status', ['Menunggu', 'Dipanggil', 'Selesai'])
+                    ->whereNotIn('status', ['Dibatalkan', 'Tidak Hadir'])
                     ->count();
 
                 $quotaLeft = $schedule->quota - $bookedCount;
@@ -294,12 +315,11 @@ class AntrianController extends Controller
         return response()->json($availableDates);
     }
 
-    // API booked slots + blocked berdasarkan durasi masing-masing layanan
     public function getBookedSlots($doctorName, $date)
     {
         $bookings = PatientHistory::where('dokter', $doctorName)
             ->where('tanggal', $date)
-            ->whereNotIn('status', ['Dibatalkan'])
+            ->whereNotIn('status', ['Dibatalkan', 'Selesai', 'Tidak Hadir'])
             ->select('appointment_time', 'poli')
             ->get();
 
@@ -326,7 +346,6 @@ class AntrianController extends Controller
         ]);
     }
 
-    // API durasi layanan untuk validasi di frontend
     public function getServiceDurations()
     {
         $services = Service::where('is_active', true)

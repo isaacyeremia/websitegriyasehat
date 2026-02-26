@@ -63,7 +63,6 @@
         outline: none;
     }
 
-    /* Burger Lines */
     .navbar-toggler-icon {
         display: block;
         width: 25px;
@@ -215,142 +214,159 @@
         margin-top: 100px !important;
     }
 
+    /* =====================================================
+       FOOTER - paksa z-index rendah agar tidak tembus modal
+       ===================================================== */
+    footer,
+    .footer,
+    .footer-top,
+    .footer-bottom,
+    .footer-cols,
+    .footer-col {
+        position: relative !important;
+        z-index: 0 !important;
+    }
+
     /* ========================================================================
-   ⭐ MODAL & BACKDROP - FIX FOR HIGH DPI/SCALING LAPTOPS ⭐
-   ======================================================================== */
+       MODAL & BACKDROP - FIX FOR HIGH DPI/SCALING LAPTOPS
+    ======================================================================== */
 
-/* Hide backdrop completely - use modal background instead */
-.modal-backdrop {
-    display: none !important;
-}
+    /* Hide backdrop completely - use modal background instead */
+    .modal-backdrop {
+        display: none !important;
+    }
 
-/* Modal dengan background sendiri */
-.modal {
-    z-index: 1055 !important;
-    background-color: rgba(0, 0, 0, 0) !important;
-}
+    /* Modal dengan background sendiri */
+    .modal {
+        z-index: 1055 !important;
+        background-color: rgba(0, 0, 0, 0) !important;
+    }
 
-.modal.show {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: rgba(0, 0, 0, 0.65) !important;
-}
+    .modal.show {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background-color: rgba(0, 0, 0, 0.65) !important;
+    }
 
-/* Modal Dialog */
-.modal-dialog {
-    position: relative !important;
-    z-index: 1060 !important;
-    margin: 1.75rem auto !important;
-    max-width: 500px !important;
-}
-
-/* Modal Dialog Centered */
-.modal-dialog-centered {
-    display: flex !important;
-    align-items: center !important;
-    min-height: calc(100% - 3.5rem) !important;
-}
-
-/* Modal Dialog Scrollable */
-.modal-dialog-scrollable {
-    height: auto !important;
-    max-height: calc(100vh - 3.5rem) !important;
-}
-
-.modal-dialog-scrollable .modal-content {
-    max-height: 100% !important;
-    overflow: hidden !important;
-}
-
-.modal-dialog-scrollable .modal-body {
-    overflow-y: auto !important;
-    max-height: calc(100vh - 250px) !important;
-}
-
-/* Modal Content */
-.modal-content {
-    box-shadow: 0 15px 50px rgba(0,0,0,0.5) !important;
-    border: none !important;
-    border-radius: 12px !important;
-    position: relative !important;
-    z-index: 1061 !important;
-    pointer-events: auto !important;
-}
-
-/* Modal Header */
-.modal-header {
-    border-radius: 12px 12px 0 0 !important;
-    flex-shrink: 0 !important;
-}
-
-/* Modal Body */
-.modal-body {
-    position: relative !important;
-}
-
-/* Modal Footer */
-.modal-footer {
-    flex-shrink: 0 !important;
-}
-
-/* Body saat modal terbuka */
-body.modal-open {
-    overflow: hidden !important;
-    padding-right: 0 !important;
-}
-
-/* Force ALL modal elements clickable */
-.modal *,
-.modal input,
-.modal select,
-.modal textarea,
-.modal button,
-.modal .btn,
-.modal .btn-close,
-.modal .form-control,
-.modal .form-select,
-.modal label,
-.modal .alert {
-    pointer-events: auto !important;
-    position: relative !important;
-}
-
-.modal input,
-.modal select,
-.modal button,
-.modal .btn {
-    cursor: pointer !important;
-}
-
-.modal input[type="text"],
-.modal input[type="date"],
-.modal input[type="number"],
-.modal input[type="email"],
-.modal input[type="password"],
-.modal textarea {
-    cursor: text !important;
-}
-
-/* Responsive */
-@media (max-width: 576px) {
+    /* Modal Dialog */
     .modal-dialog {
-        max-width: calc(100% - 1rem) !important;
-        margin: 0.5rem !important;
+        position: relative !important;
+        z-index: 1060 !important;
+        margin: 1.75rem auto !important;
+        max-width: 500px !important;
     }
-    
+
+    /* Modal Dialog Centered */
     .modal-dialog-centered {
-        min-height: calc(100% - 1rem) !important;
+        display: flex !important;
+        align-items: center !important;
+        min-height: calc(100% - 3.5rem) !important;
     }
-    
+
+    /* Modal Dialog Scrollable */
     .modal-dialog-scrollable {
-        max-height: calc(100vh - 1rem) !important;
+        height: auto !important;
+        max-height: calc(100vh - 3.5rem) !important;
     }
-    
+
+    .modal-dialog-scrollable .modal-content {
+        max-height: 100% !important;
+        overflow: hidden !important;
+    }
+
     .modal-dialog-scrollable .modal-body {
-        max-height: calc(100vh - 180px) !important;
+        overflow-y: auto !important;
+        max-height: calc(100vh - 250px) !important;
     }
-}
+
+    /* Modal Content - putih solid agar footer tidak tembus */
+    .modal-content {
+        background-color: #ffffff !important;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.5) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        position: relative !important;
+        z-index: 1061 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Modal Header - JANGAN override background,
+       biarkan class bg-primary/bg-success dll dari blade bekerja */
+    .modal-header {
+        border-radius: 12px 12px 0 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Modal Body */
+    .modal-body {
+        background-color: #ffffff !important;
+        position: relative !important;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+        background-color: #ffffff !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Body saat modal terbuka */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+
+    /* Force ALL modal elements clickable */
+    .modal *,
+    .modal input,
+    .modal select,
+    .modal textarea,
+    .modal button,
+    .modal .btn,
+    .modal .btn-close,
+    .modal .form-control,
+    .modal .form-select,
+    .modal label,
+    .modal .alert {
+        pointer-events: auto !important;
+        position: relative !important;
+    }
+
+    .modal input,
+    .modal select,
+    .modal button,
+    .modal .btn {
+        cursor: pointer !important;
+    }
+
+    .modal input[type="text"],
+    .modal input[type="date"],
+    .modal input[type="number"],
+    .modal input[type="email"],
+    .modal input[type="password"],
+    .modal textarea {
+        cursor: text !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .modal-dialog {
+            max-width: calc(100% - 1rem) !important;
+            margin: 0.5rem !important;
+        }
+        
+        .modal-dialog-centered {
+            min-height: calc(100% - 1rem) !important;
+        }
+        
+        .modal-dialog-scrollable {
+            max-height: calc(100vh - 1rem) !important;
+        }
+        
+        .modal-dialog-scrollable .modal-body {
+            max-height: calc(100vh - 180px) !important;
+        }
+    }
   </style>
 </head>
 
@@ -381,7 +397,6 @@ body.modal-open {
           <a href="{{ route('profile') }}">Profile</a>
           <a href="{{ route('apotek.index') }}">Katalog</a>
           
-          {{-- Link Dashboard Admin (hanya muncul jika user adalah admin) --}}
           @auth
             @if(Auth::user()->isAdmin())
               <a href="{{ route('admin.dashboard') }}" class="text-danger fw-bold">
@@ -389,7 +404,6 @@ body.modal-open {
               </a>
             @endif
 
-            {{-- Link Dashboard Terapis (hanya muncul jika user adalah terapis) --}}
             @if(Auth::user()->isTerapis())
               <a href="{{ route('terapis.dashboard') }}" class="text-primary fw-bold">
                 <i class="bi bi-clipboard-heart"></i> Dashboard Terapis
@@ -460,9 +474,36 @@ body.modal-open {
         });
       }
 
-      // Clean up modal backdrop saat ditutup
-      document.addEventListener('hidden.bs.modal', function() {
+      // Modal fix - remove backdrop and use modal background
+      document.addEventListener('show.bs.modal', function(event) {
+        const modal = event.target;
+
+        // Remove any existing backdrop
         document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+        // Set modal background
+        setTimeout(() => {
+          modal.style.backgroundColor = 'rgba(0, 0, 0, 0.65)';
+          modal.style.display = 'flex';
+          modal.style.alignItems = 'center';
+          modal.style.justifyContent = 'center';
+
+          // Force all elements clickable
+          modal.querySelectorAll('*').forEach(el => {
+            el.style.pointerEvents = 'auto';
+          });
+        }, 10);
+      });
+
+      // Clean up when modal closes
+      document.addEventListener('hidden.bs.modal', function(event) {
+        const modal = event.target;
+        modal.style.backgroundColor = '';
+
+        // Clean up any leftover backdrops
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+        // Reset body
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
