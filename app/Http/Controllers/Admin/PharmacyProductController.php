@@ -24,6 +24,9 @@ class PharmacyProductController extends Controller
         'sirup'    => 'Sirup',
     ];
 
+    // ================================
+    // INDEX
+    // ================================
     public function index(Request $request)
     {
         $query = PharmacyProduct::query();
@@ -56,12 +59,18 @@ class PharmacyProductController extends Controller
         return view('admin.pharmacy.index', compact('products', 'categories'));
     }
 
+    // ================================
+    // CREATE
+    // ================================
     public function create()
     {
         $categories = self::CATEGORIES;
         return view('admin.pharmacy.create', compact('categories'));
     }
 
+    // ================================
+    // STORE
+    // ================================
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -75,7 +84,8 @@ class PharmacyProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $this->processAndSaveImage($request->file('image'));
+            // Simpan path lengkap ke DB: images/pharmacy-products/filename.jpg
+            $validated['image'] = self::IMAGE_DIR . '/' . $this->processAndSaveImage($request->file('image'));
         }
 
         $validated['is_active'] = $request->has('is_active');
@@ -86,6 +96,9 @@ class PharmacyProductController extends Controller
                          ->with('success', 'Produk berhasil ditambahkan!');
     }
 
+    // ================================
+    // EDIT
+    // ================================
     public function edit($id)
     {
         $product    = PharmacyProduct::findOrFail($id);
@@ -93,6 +106,9 @@ class PharmacyProductController extends Controller
         return view('admin.pharmacy.edit', compact('product', 'categories'));
     }
 
+    // ================================
+    // UPDATE
+    // ================================
     public function update(Request $request, $id)
     {
         $product = PharmacyProduct::findOrFail($id);
@@ -108,8 +124,9 @@ class PharmacyProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            // Hapus file lama, lalu simpan path lengkap yang baru
             $this->deleteImage($product->image);
-            $validated['image'] = $this->processAndSaveImage($request->file('image'));
+            $validated['image'] = self::IMAGE_DIR . '/' . $this->processAndSaveImage($request->file('image'));
         }
 
         $validated['is_active'] = $request->has('is_active');
@@ -120,6 +137,9 @@ class PharmacyProductController extends Controller
                          ->with('success', 'Produk berhasil diupdate!');
     }
 
+    // ================================
+    // DESTROY
+    // ================================
     public function destroy($id)
     {
         $product = PharmacyProduct::findOrFail($id);
@@ -130,6 +150,9 @@ class PharmacyProductController extends Controller
                          ->with('success', 'Produk berhasil dihapus!');
     }
 
+    // ================================
+    // TOGGLE STATUS
+    // ================================
     public function toggleStatus($id)
     {
         $product            = PharmacyProduct::findOrFail($id);
@@ -153,41 +176,40 @@ class PharmacyProductController extends Controller
     private function getImageDir(): string
     {
         $candidates = [
-            base_path('../public_html/' . self::IMAGE_DIR),  // shared hosting: /home/user/public_html/...
-            public_path(self::IMAGE_DIR),                     // Laravel standard: /var/www/html/public/...
+            base_path('../public_html/' . self::IMAGE_DIR),  // shared hosting Hostinger
+            public_path(self::IMAGE_DIR),                     // Laravel standard
             base_path('public/' . self::IMAGE_DIR),           // fallback explicit
         ];
 
         foreach ($candidates as $dir) {
-            // Coba buat folder jika belum ada
             if (!is_dir($dir)) {
                 @mkdir($dir, 0755, true);
             }
-            // Pakai folder ini jika berhasil dibuat / sudah ada dan writable
             if (is_dir($dir) && is_writable($dir)) {
                 return $dir;
             }
         }
 
-        // Last resort: public_path (biarkan error alami jika tidak bisa tulis)
         return public_path(self::IMAGE_DIR);
     }
 
+    /**
+     * Proses resize gambar dan simpan ke disk.
+     * Mengembalikan hanya NAMA FILE (tanpa path), e.g. "prod_abc123.webp"
+     * Path lengkap (IMAGE_DIR/filename) disusun di store() dan update().
+     */
     private function processAndSaveImage($file): string
     {
-        $dir = $this->getImageDir();
-
+        $dir      = $this->getImageDir();
         $mime     = $file->getMimeType();
         $realPath = $file->getRealPath();
 
-        // Cek fitur GD yang tersedia di instalasi PHP ini
         $gdInfo    = function_exists('gd_info') ? gd_info() : [];
         $webpRead  = function_exists('imagecreatefromwebp') && !empty($gdInfo['WebP Support']);
         $webpWrite = function_exists('imagewebp') && !empty($gdInfo['WebP Support']);
 
-        // Load source image sesuai mime type
+        // Load source image sesuai mime
         $src = null;
-
         if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
             $src = imagecreatefromjpeg($realPath);
         } elseif ($mime === 'image/png' && function_exists('imagecreatefrompng')) {
@@ -210,7 +232,6 @@ class PharmacyProductController extends Controller
 
         $origW = imagesx($src);
         $origH = imagesy($src);
-
         [$newW, $newH] = $this->calcResizeDimensions($origW, $origH, self::IMAGE_MAX_WIDTH, self::IMAGE_MAX_HEIGHT);
 
         $dst = imagecreatetruecolor($newW, $newH);
@@ -219,7 +240,7 @@ class PharmacyProductController extends Controller
         imagefill($dst, 0, 0, imagecolorallocatealpha($dst, 0, 0, 0, 127));
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
 
-        // Simpan: WebP jika didukung, JPG sebagai fallback
+        // Simpan WebP jika didukung, fallback JPG
         if ($webpWrite) {
             $filename = uniqid('prod_') . '.webp';
             imagewebp($dst, $dir . DIRECTORY_SEPARATOR . $filename, self::IMAGE_QUALITY);
@@ -251,20 +272,26 @@ class PharmacyProductController extends Controller
         return $img;
     }
 
+    /**
+     * Hapus file gambar dari disk.
+     * $image = path lengkap dari DB, e.g. "images/pharmacy-products/prod_abc.jpg"
+     */
     private function deleteImage(?string $image): void
     {
         if (!$image) return;
-        if (!str_contains($image, '/')) {
-            // Coba hapus dari semua kemungkinan lokasi
-            $candidates = [
-                base_path('../public_html/' . self::IMAGE_DIR . DIRECTORY_SEPARATOR . basename($image)),
-                public_path(self::IMAGE_DIR . DIRECTORY_SEPARATOR . basename($image)),
-            ];
-            foreach ($candidates as $path) {
-                if (file_exists($path)) {
-                    @unlink($path);
-                    break;
-                }
+
+        // Ambil hanya nama file dari path DB
+        $filename = basename($image);
+
+        $candidates = [
+            base_path('../public_html/' . self::IMAGE_DIR . DIRECTORY_SEPARATOR . $filename),
+            public_path(self::IMAGE_DIR . DIRECTORY_SEPARATOR . $filename),
+        ];
+
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                @unlink($path);
+                break;
             }
         }
     }

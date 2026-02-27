@@ -178,7 +178,8 @@
                                 {{-- Gambar --}}
                                 <td>
                                     @if($product->image)
-                                        <img src="{{ asset('images/pharmacy-products/' . $product->image) }}"
+                                        {{-- image di DB sudah path lengkap: images/pharmacy-products/xxx.jpg --}}
+                                        <img src="{{ asset($product->image) }}"
                                              alt="{{ $product->name }}"
                                              class="img-thumbnail"
                                              style="width:60px;height:60px;object-fit:cover;flex-shrink:0;"
@@ -234,7 +235,7 @@
                                     @endif
                                 </td>
 
-                                {{-- Status Toggle — pakai modal konfirmasi --}}
+                                {{-- Status Toggle --}}
                                 <td>
                                     <form method="POST"
                                           action="{{ route('admin.pharmacy.toggle', $product->id) }}"
@@ -269,7 +270,6 @@
                                            class="btn btn-outline-primary" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        {{-- Hapus: pakai modal konfirmasi --}}
                                         <form method="POST"
                                               action="{{ route('admin.pharmacy.destroy', $product->id) }}"
                                               class="d-inline confirm-form"
@@ -305,9 +305,7 @@
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════════
-     MODAL KONFIRMASI — reusable
-═══════════════════════════════════════════ --}}
+{{-- Modal Konfirmasi --}}
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
     <div class="modal-content" style="border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.18);">

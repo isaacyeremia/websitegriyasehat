@@ -16,15 +16,10 @@ class ApotekController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($product) use ($thirtyDaysAgo) {
-                $isNewUpload = !str_contains($product->image, '/');
-                $imagePath   = $isNewUpload
-                    ? 'images/pharmacy-products/' . $product->image
-                    : $product->image;
-
                 return [
                     'name'        => $product->name,
                     'price'       => $product->price,
-                    'image'       => $imagePath,
+                    'image'       => $product->image, // path sudah konsisten di DB: images/pharmacy-products/xxx.jpg
                     'link'        => $product->tokopedia_link,
                     'category'    => $product->category,
                     'description' => $product->description,
@@ -36,4 +31,3 @@ class ApotekController extends Controller
         return view('apotek.index', compact('products'));
     }
 }
-

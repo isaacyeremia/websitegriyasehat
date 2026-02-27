@@ -92,11 +92,11 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Gambar Produk</label>
 
-                            {{-- Gambar saat ini --}}
+                            {{-- Gambar saat ini — path sudah lengkap di DB: images/pharmacy-products/xxx.jpg --}}
                             @if($product->image)
                                 <div class="mb-2">
                                     <small class="text-muted d-block mb-1">Gambar saat ini:</small>
-                                    <img src="{{ asset('images/pharmacy-products/' . $product->image) }}"
+                                    <img src="{{ asset($product->image) }}"
                                          alt="{{ $product->name }}"
                                          class="img-thumbnail d-block"
                                          style="max-width:200px;max-height:200px;object-fit:contain;"
@@ -115,7 +115,7 @@
                             @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             <small class="text-muted">
                                 Format: JPG, PNG, GIF, WebP · Maks. 10MB ·
-                                <span class="text-success fw-semibold">Otomatis di-resize & dikonversi ke WebP</span>
+                                <span class="text-success fw-semibold">Otomatis di-resize &amp; dikonversi ke WebP</span>
                                 · Kosongkan jika tidak ingin mengganti gambar
                             </small>
 

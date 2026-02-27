@@ -101,7 +101,10 @@
                                 Format: JPG, PNG, GIF, WebP · Maks. 10MB ·
                                 <span class="text-success fw-semibold">Gambar akan otomatis di-resize ke 800×800px dan dikonversi ke WebP</span>
                             </small>
+
+                            {{-- Preview --}}
                             <div id="imagePreview" class="mt-2" style="display:none;">
+                                <small class="text-muted d-block mb-1">Preview:</small>
                                 <img id="previewImg" src="" alt="Preview"
                                      class="img-thumbnail" style="max-width:200px;">
                             </div>
