@@ -10,15 +10,14 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Terapis\TerapisAuthController;
 use App\Http\Controllers\Terapis\PatientManagementController;
 use App\Http\Controllers\Admin\DoctorManagementController;
+use App\Http\Controllers\Admin\PromosiController;
 
 // ============================================================
-// ROOT / HOMEPAGE - Tampilkan home.blade.php
+// ROOT / HOMEPAGE - Tampilkan home.blade.php + data promosi
 // ============================================================
 Route::get('/', function () {
-    if (auth()->check()) {
-        return view('home');
-    }
-    return view('home');
+    $promosis = \App\Models\Promosi::aktif()->get();
+    return view('home', compact('promosis'));
 })->name('welcome');
 
 // ============================================================
@@ -51,6 +50,10 @@ Route::get('/apotek', [ApotekController::class, 'index'])->name('apotek.index');
 // Route antrian - accessible to all (controller will redirect if not auth)
 Route::get('/antrian', [AntrianController::class, 'index'])->name('booking.index');
 
+// ── Promosi detail (public) ──
+Route::get('/promosi/{promosi}', [App\Http\Controllers\PromosiControllerPublic::class, 'show'])
+    ->name('promosi.show');
+
 // ============================================================
 // AUTHENTICATED USER ROUTES
 // ============================================================
@@ -58,7 +61,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
     Route::get('/home', function () {
-        return view('home');
+        $promosis = \App\Models\Promosi::aktif()->get();
+        return view('home', compact('promosis'));
     })->name('home');
     
     // Profile routes
@@ -102,13 +106,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/patients/{id}', [AdminController::class, 'updatePatient'])->name('patients.update');
     Route::delete('/patients/{id}', [AdminController::class, 'destroyPatient'])->name('patients.destroy');
     
-    // Manajemen AKUN terapis
-    Route::get('/terapis', [AdminController::class, 'terapisIndex'])->name('terapis.index');
-    Route::get('/terapis/create', [AdminController::class, 'createTerapis'])->name('terapis.create');
-    Route::post('/terapis', [AdminController::class, 'storeTerapis'])->name('terapis.store');
-    Route::get('/terapis/{id}/edit', [AdminController::class, 'editTerapis'])->name('terapis.edit');
-    Route::put('/terapis/{id}', [AdminController::class, 'updateTerapis'])->name('terapis.update');
-    Route::delete('/terapis/{id}', [AdminController::class, 'destroyTerapis'])->name('terapis.destroy');
+    // Manajemen PROFIL terapis
+    Route::get('/terapis', [DoctorManagementController::class, 'index'])->name('terapis.index');
+    Route::get('/terapis/create', [DoctorManagementController::class, 'create'])->name('terapis.create');
+    Route::post('/terapis', [DoctorManagementController::class, 'store'])->name('terapis.store');
+    Route::get('/terapis/{id}/edit', [DoctorManagementController::class, 'edit'])->name('terapis.edit');
+    Route::put('/terapis/{id}', [DoctorManagementController::class, 'update'])->name('terapis.update');
+    Route::delete('/terapis/{id}', [DoctorManagementController::class, 'destroy'])->name('terapis.destroy');
+    Route::patch('/terapis/{id}/toggle', [DoctorManagementController::class, 'toggleActive'])->name('terapis.toggle');
+    Route::patch('/terapis/{id}/toggle-about', [DoctorManagementController::class, 'toggleAbout'])->name('terapis.toggle-about');
     
     // Manajemen Jadwal Praktek (Admin)
     Route::get('/schedules', [\App\Http\Controllers\Admin\DoctorScheduleController::class, 'index'])->name('schedules.index');
@@ -124,7 +130,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/patients/{patientId}/medical-record', [AdminController::class, 'storeMedicalRecord'])->name('medical-records.store');
     Route::get('/medical-records/{recordId}', [AdminController::class, 'showMedicalRecord'])->name('medical-records.show');
     
-    // All Medical Records View (NEW)
+    // All Medical Records View
     Route::get('/all-medical-records', [AdminController::class, 'allMedicalRecords'])->name('medical-records.all');
 
     // Manajemen Produk Apotek (Admin)
@@ -136,15 +142,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/pharmacy/{id}', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'destroy'])->name('pharmacy.destroy');
     Route::patch('/pharmacy/{id}/toggle', [\App\Http\Controllers\Admin\PharmacyProductController::class, 'toggleStatus'])->name('pharmacy.toggle');
 
-   // Manajemen PROFIL terapis
-    Route::get('/terapis', [DoctorManagementController::class, 'index'])->name('terapis.index');
-    Route::get('/terapis/create', [DoctorManagementController::class, 'create'])->name('terapis.create');
-    Route::post('/terapis', [DoctorManagementController::class, 'store'])->name('terapis.store');
-    Route::get('/terapis/{id}/edit', [DoctorManagementController::class, 'edit'])->name('terapis.edit');
-    Route::put('/terapis/{id}', [DoctorManagementController::class, 'update'])->name('terapis.update');
-    Route::delete('/terapis/{id}', [DoctorManagementController::class, 'destroy'])->name('terapis.destroy');
-    Route::patch('/terapis/{id}/toggle', [DoctorManagementController::class, 'toggleActive'])->name('terapis.toggle');
-    Route::patch('/terapis/{id}/toggle-about', [DoctorManagementController::class, 'toggleAbout'])->name('terapis.toggle-about');
+    // ── Kelola Promosi ──
+    Route::get   ('promosi',                   [PromosiController::class, 'index'])        ->name('promosi.index');
+    Route::get   ('promosi/create',            [PromosiController::class, 'create'])       ->name('promosi.create');
+    Route::post  ('promosi',                   [PromosiController::class, 'store'])        ->name('promosi.store');
+    Route::get   ('promosi/{promosi}/edit',    [PromosiController::class, 'edit'])         ->name('promosi.edit');
+    Route::put   ('promosi/{promosi}',         [PromosiController::class, 'update'])       ->name('promosi.update');
+    Route::delete('promosi/{promosi}',         [PromosiController::class, 'destroy'])      ->name('promosi.destroy');
+    Route::patch ('promosi/{promosi}/toggle',  [PromosiController::class, 'toggleActive']) ->name('promosi.toggle');
 });
 
 // ============================================================
@@ -166,7 +171,7 @@ Route::middleware(['auth', 'terapis'])->prefix('terapis')->name('terapis.')->gro
     Route::post('/medical-records/store/{patientId}', [PatientManagementController::class, 'storeMedicalRecord'])->name('medical-records.store');
     Route::get('/medical-records/{recordId}', [PatientManagementController::class, 'showMedicalRecord'])->name('medical-records.show');
     
-    // EDIT & UPDATE MEDICAL RECORDS - NEW ROUTES
+    // EDIT & UPDATE MEDICAL RECORDS
     Route::get('/medical-records/{recordId}/edit', [PatientManagementController::class, 'editMedicalRecord'])->name('medical-records.edit');
     Route::put('/medical-records/{recordId}', [PatientManagementController::class, 'updateMedicalRecord'])->name('medical-records.update');
 });
